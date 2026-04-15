@@ -1,0 +1,23 @@
+{
+  "name": "図形模写マスター",
+  "short_name": "図形マスター",
+  "description": "図形をなぞって腕前を競うゲーム",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e0e1a",
+  "theme_color": "#0e0e1a",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
