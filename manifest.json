@@ -1,6 +1,6 @@
 {
-  "name": "図形模写マスター",
-  "short_name": "図形マスター",
+  "name": "模写マスター",
+  "short_name": "模写マスター",
   "description": "図形をなぞって腕前を競うゲーム",
   "start_url": "/",
   "display": "standalone",
