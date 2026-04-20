@@ -6,7 +6,8 @@ const ASSETS = [
   '/favicon.svg',
   '/favicon.ico',
   '/apple-touch-icon.png',
-  '/icon-512.png'
+  '/icon-512.png',
+  '/bgm.mp3'
 ];
 
 self.addEventListener('install', e => {
