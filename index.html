@@ -581,6 +581,27 @@
 
         #start-btn-wrap { text-align:center; padding-top:6px; }
         .instruction { font-size:14px; color:var(--text-dim); margin-top:8px; }
+
+        /* KANJI CHIP GRID */
+        .kanji-chip {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .kanji-chip.selected {
+            background: rgba(74,243,255,0.1);
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 10px rgba(74,243,255,0.2);
+        }
     
         /* ── MULTIPLAYER ── */
         #mp-lobby {
@@ -794,12 +815,17 @@
 
     <!-- Start -->
     <div id="start-btn-wrap">
-        <div class="mode-toggle">
-            <button class="mode-btn active" id="mode-shape" onclick="setMode('shape')">🔷 図形モード</button>
-            <button class="mode-btn" id="mode-char" onclick="setMode('char')">🈳 文字モード</button>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <div class="mode-toggle" style="flex:1; margin-bottom:0;">
+                <button class="mode-btn active" id="mode-shape" onclick="setMode('shape')">🔷 図形</button>
+                <button class="mode-btn" id="mode-char" onclick="setMode('char')">🈳 文字</button>
+                <button class="mode-btn" id="mode-kanji" onclick="setMode('kanji')">漢字</button>
+            </div>
+            <button onclick="openKanjiSettings()" style="background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:50%; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-dim); flex-shrink:0;">⚙️</button>
         </div>
         <div class="mode-desc" id="mode-desc-shape">円・三角・ハートなど図形を模写</div>
         <div class="mode-desc" id="mode-desc-char" style="display:none;">ひらがな・カタカナを文字で模写</div>
+        <div class="mode-desc" id="mode-desc-kanji" style="display:none;">漢字を模写（お気に入り設定可）</div>
 
         <!-- Shape select button (shape mode only) -->
         <div id="shape-picker-wrap" style="margin-top:8px; text-align:center;">
@@ -1067,6 +1093,17 @@
         <button onclick="clearAllHistory()" style="background:none;border:none;color:#ff4a4a;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:4px;">記録をすべて削除</button>
     </div>
 
+    <!-- Kanji Settings Modal -->
+    <div id="kanji-settings-modal" style="display:none; position:absolute; inset:0; background:rgba(10,10,20,0.98); z-index:500; border-radius:26px; padding:20px; flex-direction:column; animation: fadeIn 0.2s ease;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="font-size:16px; font-weight:700; color:var(--text);">漢字カスタマイズ</div>
+            <button class="av-close" onclick="closeKanjiSettings()">✕</button>
+        </div>
+        <div style="font-size:11px; color:var(--text-dim); margin-bottom:10px;">練習したい漢字を選んでください（複数選択可）</div>
+        <div id="kanji-grid" style="flex:1; overflow-y:auto; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding-right:5px;"></div>
+        <button class="btn btn-primary" onclick="closeKanjiSettings()" style="margin-top:15px; width:100%;">設定を保存</button>
+    </div>
+
     <!-- Clear history confirm dialog -->
     <div id="clear-history-dialog" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.75); z-index:600; border-radius:26px; align-items:center; justify-content:center;">
         <div style="background:var(--card); border:1px solid var(--border); border-radius:20px; padding:26px 22px; text-align:center; width:260px; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
@@ -1287,6 +1324,50 @@ const katakana = [
 ];
 
 const charColors = ['#ff6b9d','#a29bfe','#55efc4','#fdcb6e','#74b9ff','#fd79a8','#00cec9','#e17055'];
+
+// ── Kanji mode ──
+const ALL_KANJI = "日月火水木金土山川田大中小上下左右内外白円入出立休見学先生千万永和花月空王石本正四手天羊坂戸".split("");
+let favoriteKanji = [];
+
+function loadKanjiSettings() {
+    try {
+        const saved = localStorage.getItem('mosha_fav_kanji');
+        if (saved) {
+            // Filter out any kanji no longer in ALL_KANJI
+            const parsed = JSON.parse(saved).filter(k => ALL_KANJI.includes(k));
+            favoriteKanji = parsed.length > 0 ? parsed : [...ALL_KANJI];
+        } else {
+            favoriteKanji = [...ALL_KANJI];
+        }
+    } catch(e) { favoriteKanji = [...ALL_KANJI]; }
+}
+
+function toggleKanji(char) {
+    if (favoriteKanji.includes(char)) {
+        if (favoriteKanji.length > 1) favoriteKanji = favoriteKanji.filter(k => k !== char);
+    } else {
+        favoriteKanji.push(char);
+    }
+    try { localStorage.setItem('mosha_fav_kanji', JSON.stringify(favoriteKanji)); } catch(e) {}
+    renderKanjiGrid();
+}
+
+function openKanjiSettings() {
+    renderKanjiGrid();
+    document.getElementById('kanji-settings-modal').style.display = 'flex';
+}
+
+function closeKanjiSettings() {
+    document.getElementById('kanji-settings-modal').style.display = 'none';
+    updateReadyLabel();
+}
+
+function renderKanjiGrid() {
+    const grid = document.getElementById('kanji-grid');
+    grid.innerHTML = ALL_KANJI.map(k =>
+        `<div class="kanji-chip ${favoriteKanji.includes(k) ? 'selected' : ''}" onclick="toggleKanji('${k}')">${k}</div>`
+    ).join('');
+}
 
 let gameMode = 'shape'; // 'shape' or 'char'
 let timeModeSeconds = 10; // 5 or 10
@@ -1803,7 +1884,7 @@ function saveGameRecord(sorted, maxScore, solo=false) {
         date: dateKey,
         time,
         solo,
-        mode: gameMode === 'char' ? '文字' : '図形',
+        mode: gameMode === 'char' ? '文字' : gameMode === 'kanji' ? '漢字' : '図形',
         rounds: TOTAL_ROUNDS,
         seconds: timeModeSeconds,
         maxScore,
@@ -1967,6 +2048,7 @@ function doClearHistory() {
 // Also add history button to the start menu
 window.addEventListener('load', () => {
     buildShapePicker();
+    loadKanjiSettings();
     // Show current settings in ready overlay
     const modeLabel = (gameMode === 'char' ? '文字モード' : '図形モード') + ' · ' + timeModeSeconds + '秒 · ' + TOTAL_ROUNDS + '問';
     const el = document.getElementById('ready-mode-label');
@@ -2140,8 +2222,8 @@ function closeReward() {
 function updateReadyLabel() {
     const el = document.getElementById('ready-mode-label');
     if (el && document.getElementById('ready-overlay').style.display === 'flex') {
-        let label = (gameMode === 'char' ? '文字モード' : '図形モード') + ' · ' + timeModeSeconds + '秒 · ' + TOTAL_ROUNDS + '問';
-
+        let modeStr = gameMode === 'char' ? '文字モード' : gameMode === 'kanji' ? '漢字モード' : '図形モード';
+        let label = modeStr + ' · ' + timeModeSeconds + '秒 · ' + TOTAL_ROUNDS + '問';
         el.innerText = label;
     }
 }
@@ -2150,8 +2232,10 @@ function setMode(mode) {
     gameMode = mode;
     document.getElementById('mode-shape').classList.toggle('active', mode==='shape');
     document.getElementById('mode-char').classList.toggle('active', mode==='char');
-    document.getElementById('mode-desc-shape').style.display = mode==='shape' ? 'block' : 'none';
-    document.getElementById('mode-desc-char').style.display  = mode==='char'  ? 'block' : 'none';
+    document.getElementById('mode-kanji').classList.toggle('active', mode==='kanji');
+    document.getElementById('mode-desc-shape').style.display = mode==='shape'  ? 'block' : 'none';
+    document.getElementById('mode-desc-char').style.display  = mode==='char'   ? 'block' : 'none';
+    document.getElementById('mode-desc-kanji').style.display = mode==='kanji'  ? 'block' : 'none';
     document.getElementById('shape-picker-wrap').style.display = mode==='shape' ? 'block' : 'none';
     updateReadyLabel();
 }
@@ -2299,8 +2383,20 @@ function nextLevel() {
     progressFill.style.width=((round-1)/TOTAL_ROUNDS*100)+'%';
     timerEl.classList.remove('danger');
 
-    if (gameMode === 'char') {
-        // Pick random character (hiragana or katakana)
+    if (gameMode === 'kanji') {
+        // Pick random kanji from favorites, avoiding the last used one
+        let pool = favoriteKanji.length > 0 ? favoriteKanji : ALL_KANJI;
+        if (roundResults.length >= 1) {
+            const lastChar = roundResults[roundResults.length-1].char;
+            if (lastChar && pool.length > 1) pool = pool.filter(k => k !== lastChar);
+        }
+        const char = pool[Math.floor(Math.random() * pool.length)];
+        currentShape = { name: `漢字: ${char}`, type: 'char', color: '#ffd84a', char };
+        currentIdeal = getCharPoints(char);
+        drawCharGuide(char, '#ffd84a');
+        guideCanvas.style.opacity = '0.40';
+        pCtx.clearRect(0,0,W,W);
+    } else if (gameMode === 'char') {
         const allChars = [...hiragana, ...katakana];
         // Avoid repeats
         let charPool = allChars;
