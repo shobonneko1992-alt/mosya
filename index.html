@@ -26,6 +26,14 @@
             --text: #e8e8ff;
             --text-dim: #7070a0;
         }
+        body.light-mode {
+            --bg: #f0f0f5;
+            --card: #ffffff;
+            --border: #d0d0e0;
+            --text: #1a1a2e;
+            --text-dim: #6060a0;
+        }
+        body.light-mode::before { display: none; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -139,18 +147,28 @@
             margin: 0 auto;
             border-radius: 18px; overflow: hidden;
             border: 2px solid var(--border);
+            background: #ffffff;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.08);
+            touch-action: none;
+            transition: background 0.3s;
+        }
+        .canvas-wrap.canvas-dark {
             background: #0a0a14;
             box-shadow: inset 0 0 30px rgba(0,0,0,0.4);
-            touch-action: none;
         }
         .canvas-wrap::before {
             content: '';
             position: absolute; inset: 0;
             background-image:
-                linear-gradient(rgba(74,243,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(74,243,255,0.03) 1px, transparent 1px);
+                linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
             background-size: 40px 40px;
             pointer-events: none; z-index: 0;
+        }
+        .canvas-wrap.canvas-dark::before {
+            background-image:
+                linear-gradient(rgba(74,243,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(74,243,255,0.03) 1px, transparent 1px);
         }
         canvas { position: absolute; top:0; left:0; border-radius:16px; }
         #guide-canvas { z-index:1; opacity:0.45; }
@@ -160,7 +178,7 @@
         /* ROUND RESULT OVERLAY */
         #result-overlay {
             position: absolute; inset: 0;
-            background: rgba(10,10,20,0.93);
+            background: rgba(255,255,255,0.93);
             display: none;
             flex-direction: column;
             align-items: center;
@@ -170,6 +188,11 @@
             gap: 6px;
             backdrop-filter: blur(4px);
         }
+        .canvas-dark #result-overlay {
+            background: rgba(10,10,20,0.93);
+        }
+        .canvas-dark .result-label { color: #7070a0; }
+        .canvas-dark .running-total { color: #7070a0; }
         .result-label { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-dim); }
         .score-val {
             font-family: 'Boogaloo', cursive;
@@ -718,7 +741,7 @@
 </style>
 </head>
 <body>
-<audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
+<audio id="bgm" loop preload="none"></audio>
 <div id="game-container">
 
     <div class="header">
@@ -736,7 +759,7 @@
     <!-- Progress bar -->
     <div class="progress-wrap" id="progress-wrap">
         <div class="progress-meta">
-            <span>ROUND <span class="val" id="round-num">1</span> / <span id="total-rounds-display">10</span></span>
+            <span>ROUND <span class="val" id="round-num">1</span> / <span id="total-rounds-display">5</span></span>
             <span>TOTAL <span class="val" id="running-total-header">0</span></span>
         </div>
         <div class="progress-track">
@@ -815,13 +838,10 @@
 
     <!-- Start -->
     <div id="start-btn-wrap">
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-            <div class="mode-toggle" style="flex:1; margin-bottom:0;">
-                <button class="mode-btn active" id="mode-shape" onclick="setMode('shape')">🔷 図形</button>
-                <button class="mode-btn" id="mode-char" onclick="setMode('char')">🈳 文字</button>
-                <button class="mode-btn" id="mode-kanji" onclick="setMode('kanji')">漢字</button>
-            </div>
-            <button onclick="openKanjiSettings()" style="background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:50%; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-dim); flex-shrink:0;">⚙️</button>
+        <div class="mode-toggle" style="margin-bottom:10px;">
+            <button class="mode-btn active" id="mode-shape" onclick="setMode('shape')">🔷 図形</button>
+            <button class="mode-btn" id="mode-char" onclick="setMode('char')">🈳 文字</button>
+            <button class="mode-btn" id="mode-kanji" onclick="setMode('kanji')">漢字</button>
         </div>
         <div class="mode-desc" id="mode-desc-shape">円・三角・ハートなど図形を模写</div>
         <div class="mode-desc" id="mode-desc-char" style="display:none;">ひらがな・カタカナを文字で模写</div>
@@ -835,6 +855,24 @@
                 <span id="shape-select-count" style="font-family:'Boogaloo',cursive; font-size:14px; color:var(--neon-blue);">10 / 10</span>
             </button>
         </div>
+
+        <!-- Kanji select button (kanji mode only) -->
+        <div id="kanji-picker-wrap" style="margin-top:8px; text-align:center; display:none;">
+            <button class="btn btn-clear" id="kanji-select-btn" onclick="openKanjiSettings()"
+                style="width:100%; font-size:13px; padding:9px; border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+                <span>📝 漢字セレクト</span>
+                <span id="kanji-select-count" style="font-family:'Boogaloo',cursive; font-size:14px; color:var(--neon-yellow);">-- / --</span>
+            </button>
+        </div>
+
+        <!-- Char select button (char mode only) -->
+        <div id="char-picker-wrap" style="margin-top:8px; text-align:center; display:none;">
+            <button class="btn btn-clear" onclick="openCharSettings()"
+                style="width:100%; font-size:13px; padding:9px; border-radius:12px; display:flex; align-items:center; justify-content:space-between;">
+                <span>🔤 文字セレクト</span>
+                <span id="char-select-count" style="font-family:'Boogaloo',cursive; font-size:14px; color:var(--neon-blue);">-- / --</span>
+            </button>
+        </div>
         <div class="mode-toggle" style="margin-top:8px;">
             <button class="mode-btn" id="time-5" onclick="setTimeMode(5)">⚡ 5秒</button>
             <button class="mode-btn active" id="time-10" onclick="setTimeMode(10)">⏱ 10秒</button>
@@ -842,8 +880,8 @@
         <div style="margin-top:8px;">
             <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-bottom:5px; text-align:center;">問題数</div>
             <div class="mode-toggle" style="margin-top:0;">
-                <button class="mode-btn" id="rounds-5"  onclick="setRounds(5)">5問</button>
-                <button class="mode-btn active" id="rounds-10" onclick="setRounds(10)">10問</button>
+                <button class="mode-btn active" id="rounds-5"  onclick="setRounds(5)">5問</button>
+                <button class="mode-btn" id="rounds-10" onclick="setRounds(10)">10問</button>
                 <button class="mode-btn" id="rounds-15" onclick="setRounds(15)">15問</button>
                 <button class="mode-btn" id="rounds-20" onclick="setRounds(20)">20問</button>
             </div>
@@ -880,7 +918,7 @@
                     style="font-size:14px; padding:8px 12px; text-align:left;">
             </div>
         </div>
-        <div class="instruction" id="round-instruction">全10問の合計点を競おう！（最大1000点）</div>
+        <div class="instruction" id="round-instruction">全5問の合計点を競おう！（最大500点）</div>
         <div style="margin-top:6px;">
             <button onclick="openHistory(true)" style="background:none;border:none;color:var(--text-dim);font-size:12px;cursor:pointer;text-decoration:underline;">📅 過去の記録を見る</button>
         </div>
@@ -889,13 +927,29 @@
             <input type="file" id="custom-bgm-file" accept="audio/*,audio/mp3,audio/mpeg" style="position:absolute; width:1px; height:1px; opacity:0; overflow:hidden;" onchange="loadCustomBGM(event)">
             <div id="custom-bgm-name" style="font-size:11px; color:var(--neon-green); display:none;"></div>
         </div>
+        <div style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
+            <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px; text-align:center;">画面テーマ</div>
+            <div style="display:flex; gap:6px; justify-content:center;">
+                <button id="theme-toggle-btn" onclick="toggleLightMode()" style="flex:1; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:12px; padding:8px 10px; font-size:12px; color:var(--text-dim); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:all 0.2s;">
+                    ☀️ ライトモード <span id="theme-toggle-label" style="font-weight:700; color:var(--text-dim);">OFF</span>
+                </button>
+                <button id="canvas-toggle-btn" onclick="toggleCanvasColor()" style="flex:1; background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:12px; padding:8px 10px; font-size:12px; color:var(--text-dim); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; transition:all 0.2s;">
+                    🖼️ 白キャンバス <span id="canvas-toggle-label" style="font-weight:700; color:var(--text-dim);">OFF</span>
+                </button>
+            </div>
+        </div>
+        <div style="margin-top:10px; display:flex; justify-content:center;">
+            <button onclick="openLocalMP()" style="width:100%; background:linear-gradient(135deg,rgba(253,203,110,0.12),rgba(225,112,85,0.12)); border:1px solid #fdcb6e60; border-radius:14px; padding:11px 20px; font-size:14px; color:#fdcb6e; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Boogaloo',cursive; letter-spacing:1px;">
+                👨‍👩‍👧 みんなで対戦モード
+            </button>
+        </div>
     </div>
 
     <!-- Ready screen (shown after retry) -->
     <div id="ready-wrap" style="display:none; text-align:center; padding-top:6px;">
         <div style="font-family:'Boogaloo',cursive; font-size:28px; color:var(--neon-green); text-shadow:0 0 16px rgba(74,255,160,0.5); margin-bottom:4px; letter-spacing:2px;">準備OK？</div>
         <div style="font-size:11px; color:var(--text-dim); margin-bottom:14px;">
-            <span id="ready-mode-label"></span>
+            <span id="ready-mode-label2"></span>
         </div>
         <button class="btn btn-primary" onclick="startGame()" style="font-size:17px; padding:14px 36px;">▶ スタート！</button>
     </div>
@@ -1002,7 +1056,13 @@
     <!-- Local Multiplayer Setup -->
     <div id="lmp-setup" style="display:none; position:absolute; inset:0; background:var(--card); border-radius:26px; flex-direction:column; align-items:center; padding:22px 20px; gap:12px; z-index:300; overflow-y:auto; animation:fadeIn 0.3s ease both;">
         <div style="font-family:'Boogaloo',cursive; font-size:14px; letter-spacing:3px; color:#fdcb6e;">👨‍👩‍👧 みんなで遊ぶ</div>
-        <div style="font-size:13px; color:var(--text-dim);">プレイヤーの名前を入力（2〜6人）</div>
+        <div style="font-size:12px; color:var(--text-dim); text-align:center; line-height:1.6;">同じ問題を順番にプレイ！<br>後半の点数は最後まで秘密🤫</div>
+        <!-- 現在の設定を表示 -->
+        <div id="lmp-settings-badge" style="background:rgba(74,243,255,0.06); border:1px solid rgba(74,243,255,0.2); border-radius:12px; padding:10px 18px; text-align:center; width:100%;">
+            <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-bottom:4px;">現在の設定</div>
+            <div id="lmp-settings-label" style="font-family:'Boogaloo',cursive; font-size:20px; color:var(--neon-blue); letter-spacing:2px;"></div>
+        </div>
+        <div style="font-size:13px; color:var(--text-dim);">プレイヤーの名前を入力（1〜4人）</div>
         <div id="lmp-player-inputs" style="width:100%; display:flex; flex-direction:column; gap:8px;"></div>
         <div style="display:flex; gap:8px;">
             <button class="btn btn-clear" style="font-size:13px; padding:8px 16px;" onclick="lmpAddPlayer()">＋ プレイヤー追加</button>
@@ -1020,7 +1080,7 @@
         <div style="font-size:13px; color:var(--text-dim); letter-spacing:2px;">次のプレイヤー</div>
         <div id="lmp-turn-name" style="font-family:'Boogaloo',cursive; font-size:44px; color:#fdcb6e; text-shadow:0 0 20px rgba(253,203,110,0.5); letter-spacing:2px;"></div>
         <div id="lmp-turn-num" style="font-size:13px; color:var(--text-dim);"></div>
-        <button class="btn btn-primary" style="font-size:18px; padding:14px 44px;" onclick="lmpStartTurn()">▶ スタート！</button>
+        <button class="btn btn-primary" style="font-size:18px; padding:14px 44px;" onclick="lmpStartTurn()">✅ 準備OK！</button>
     </div>
 
     <!-- Local MP: Leaderboard (shown after all players done) -->
@@ -1032,6 +1092,30 @@
             <button class="btn" style="background:linear-gradient(135deg,#fdcb6e,#e17055);color:#0a0a14;box-shadow:0 4px 0 rgba(180,80,0,0.5);font-size:14px;" onclick="lmpPlayAgain()">🔄 もう一度</button>
             <button class="btn btn-clear" style="font-size:13px;" onclick="openHistory()">📅 記録を見る</button>
             <button class="btn btn-clear" style="font-size:13px;" onclick="lmpClose()">🏠 メニュー</button>
+        </div>
+    </div>
+
+    <!-- Local MP: Dramatic Reveal Screen -->
+    <div id="lmp-reveal" style="display:none; position:absolute; inset:0; background:rgba(10,10,20,0.98); border-radius:26px; flex-direction:column; align-items:center; justify-content:center; z-index:450; gap:0; overflow:hidden;">
+        <div id="lmp-reveal-title" style="font-family:'Boogaloo',cursive; font-size:22px; letter-spacing:3px; color:#fdcb6e; text-shadow:0 0 20px rgba(253,203,110,0.5); margin-bottom:6px;">🎊 結果発表！</div>
+        <div id="lmp-reveal-num" style="font-size:12px; color:var(--text-dim); margin-bottom:20px;"></div>
+        <div id="lmp-reveal-name" style="font-family:'Boogaloo',cursive; font-size:38px; color:#fff; letter-spacing:2px; margin-bottom:8px; transition:all 0.4s;"></div>
+        <div id="lmp-reveal-rank-badge" style="font-size:14px; padding:4px 14px; border-radius:20px; margin-bottom:14px; font-weight:700; border:1px solid transparent;"></div>
+
+        <!-- 隠れている状態（発表前） -->
+        <div id="lmp-reveal-hidden-wrap" style="font-family:'Boogaloo',cursive; font-size:64px; color:var(--text-dim); letter-spacing:12px; margin-bottom:6px;">？？？</div>
+
+        <!-- 発表後スコア -->
+        <div id="lmp-reveal-score-wrap" style="position:relative; display:none; align-items:baseline; gap:6px; margin-bottom:6px;">
+            <div id="lmp-reveal-score" style="font-family:'Boogaloo',cursive; font-size:72px; color:#ffd84a; text-shadow:0 0 30px rgba(255,216,74,0.6); line-height:1; opacity:0; transition:opacity 0.5s;"></div>
+            <div id="lmp-reveal-max" style="font-size:16px; color:var(--text-dim); opacity:0; transition:opacity 0.5s;"></div>
+        </div>
+        <div id="lmp-reveal-breakdown" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center; max-width:260px; margin-top:10px; min-height:28px;"></div>
+
+        <div style="display:flex; gap:10px; margin-top:22px;">
+            <button id="lmp-reveal-show-btn" class="btn btn-primary" style="font-size:16px; padding:12px 32px;" onclick="lmpDoReveal()">発表！ 🎊</button>
+            <button id="lmp-reveal-next-btn" class="btn btn-primary" style="display:none; font-size:16px; padding:12px 32px;" onclick="lmpRevealNext()">次へ ▶</button>
+            <button id="lmp-reveal-finish-btn" class="btn" style="display:none; background:linear-gradient(135deg,#fdcb6e,#e17055);color:#0a0a14;font-size:16px;padding:12px 32px;" onclick="lmpShowLeaderboard()">🏆 ランキングへ</button>
         </div>
     </div>
 
@@ -1093,15 +1177,34 @@
         <button onclick="clearAllHistory()" style="background:none;border:none;color:#ff4a4a;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:4px;">記録をすべて削除</button>
     </div>
 
-    <!-- Kanji Settings Modal -->
-    <div id="kanji-settings-modal" style="display:none; position:absolute; inset:0; background:rgba(10,10,20,0.98); z-index:500; border-radius:26px; padding:20px; flex-direction:column; animation: fadeIn 0.2s ease;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <div style="font-size:16px; font-weight:700; color:var(--text);">漢字カスタマイズ</div>
-            <button class="av-close" onclick="closeKanjiSettings()">✕</button>
+    <!-- Char Select Modal -->
+    <div id="char-settings-modal" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.75); z-index:500; border-radius:26px; align-items:center; justify-content:center;">
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:22px; padding:22px 18px; width:300px; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                <div style="font-family:'Boogaloo',cursive; font-size:16px; letter-spacing:2px; color:var(--neon-blue);">🔤 文字セレクト</div>
+                <button onclick="closeCharSettings()" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text-dim); font-size:14px; width:28px; height:28px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-dim); margin-bottom:12px;">使いたい文字種を選んでください</div>
+            <div id="char-modal-body"></div>
+            <button onclick="closeCharSettings()" class="btn btn-next" style="width:100%; margin-top:8px; font-size:13px; padding:10px;">決定 ✓</button>
         </div>
-        <div style="font-size:11px; color:var(--text-dim); margin-bottom:10px;">練習したい漢字を選んでください（複数選択可）</div>
-        <div id="kanji-grid" style="flex:1; overflow-y:auto; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding-right:5px;"></div>
-        <button class="btn btn-primary" onclick="closeKanjiSettings()" style="margin-top:15px; width:100%;">設定を保存</button>
+    </div>
+
+    <!-- Kanji Select Modal (same style as shape select) -->
+    <div id="kanji-settings-modal" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.75); z-index:500; border-radius:26px; align-items:center; justify-content:center;">
+        <div style="background:var(--card); border:1px solid var(--border); border-radius:22px; padding:22px 18px; width:300px; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                <div style="font-family:'Boogaloo',cursive; font-size:16px; letter-spacing:2px; color:var(--neon-yellow);">📝 漢字セレクト</div>
+                <button onclick="closeKanjiSettings()" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text-dim); font-size:14px; width:28px; height:28px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+            </div>
+            <div style="font-size:11px; color:var(--text-dim); margin-bottom:10px;">練習したい漢字を選んでください（複数選択可）</div>
+            <div id="kanji-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px; max-height:240px; overflow-y:auto; padding-right:4px;"></div>
+            <div style="display:flex; gap:8px; margin-top:12px; justify-content:center;">
+                <button onclick="selectAllKanji()" class="btn btn-clear" style="font-size:12px; padding:7px 14px;">すべて選択</button>
+                <button onclick="clearAllKanji()" class="btn btn-clear" style="font-size:12px; padding:7px 14px;">すべて解除</button>
+                <button onclick="closeKanjiSettings()" class="btn btn-next" style="font-size:13px; padding:8px 18px;">決定 ✓</button>
+            </div>
+        </div>
     </div>
 
     <!-- Clear history confirm dialog -->
@@ -1190,7 +1293,7 @@ let W = 280, CENTER = 140;
     });
 })();
 
-let TOTAL_ROUNDS = 10;
+let TOTAL_ROUNDS = 5;
 
 let isDrawing=false, points=[], timeLeft=10.0;
 let timerId=null, currentShape=null, gameActive=false;
@@ -1325,13 +1428,133 @@ const katakana = [
 
 const charColors = ['#ff6b9d','#a29bfe','#55efc4','#fdcb6e','#74b9ff','#fd79a8','#00cec9','#e17055'];
 
+// ── 文字セレクト ──
+const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+// 各グループのON/OFF管理
+let charGroupEnabled = { hiragana: true, katakana: true, alphabet: true };
+
+function getActiveChars() {
+    let pool = [];
+    if (charGroupEnabled.hiragana) pool = pool.concat(hiragana);
+    if (charGroupEnabled.katakana) pool = pool.concat(katakana);
+    if (charGroupEnabled.alphabet) pool = pool.concat(alphabet);
+    return pool.length > 0 ? pool : [...hiragana]; // 最低1グループ
+}
+
+function loadCharSettings() {
+    try {
+        const saved = localStorage.getItem('mosha_char_groups');
+        if (saved) charGroupEnabled = { ...charGroupEnabled, ...JSON.parse(saved) };
+        // 最低1つONを保証
+        if (!Object.values(charGroupEnabled).some(Boolean)) charGroupEnabled.hiragana = true;
+    } catch(e) {}
+}
+
+function saveCharSettings() {
+    try { localStorage.setItem('mosha_char_groups', JSON.stringify(charGroupEnabled)); } catch(e) {}
+}
+
+function openCharSettings() {
+    renderCharModal();
+    document.getElementById('char-settings-modal').style.display = 'flex';
+}
+
+function closeCharSettings() {
+    document.getElementById('char-settings-modal').style.display = 'none';
+    updateCharCount();
+}
+
+function toggleCharGroup(group) {
+    const active = Object.values(charGroupEnabled).filter(Boolean).length;
+    if (charGroupEnabled[group] && active <= 1) return; // 最低1つ残す
+    charGroupEnabled[group] = !charGroupEnabled[group];
+    saveCharSettings();
+    renderCharModal();
+}
+
+function renderCharModal() {
+    const groups = [
+        { key: 'hiragana', label: 'ひらがな', chars: hiragana, color: '#ff6b9d' },
+        { key: 'katakana', label: 'カタカナ', chars: katakana, color: '#74b9ff' },
+        { key: 'alphabet', label: 'アルファベット', chars: alphabet, color: '#4affa0' },
+    ];
+    document.getElementById('char-modal-body').innerHTML = groups.map(g => `
+        <div style="margin-bottom:14px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                <span style="font-size:13px; font-weight:700; color:${g.color};">${g.label}</span>
+                <button onclick="toggleCharGroup('${g.key}')"
+                    style="padding:4px 14px; border-radius:20px; border:1px solid ${charGroupEnabled[g.key] ? g.color : 'var(--border)'};
+                    background:${charGroupEnabled[g.key] ? g.color+'22' : 'transparent'};
+                    color:${charGroupEnabled[g.key] ? g.color : 'var(--text-dim)'};
+                    font-size:12px; font-weight:700; cursor:pointer;">
+                    ${charGroupEnabled[g.key] ? 'ON ✓' : 'OFF'}
+                </button>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:5px;">
+                ${g.chars.map(c => `<div style="width:30px;height:30px;background:${charGroupEnabled[g.key] ? g.color+'18' : 'rgba(255,255,255,0.04)'};border:1px solid ${charGroupEnabled[g.key] ? g.color+'44' : 'var(--border)'};border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;color:${charGroupEnabled[g.key] ? g.color : 'var(--text-dim)'};">${c}</div>`).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateCharCount() {
+    const el = document.getElementById('char-select-count');
+    if (!el) return;
+    const count = getActiveChars().length;
+    const total = hiragana.length + katakana.length + alphabet.length;
+    el.innerText = `${count} / ${total}`;
+}
+
 // ── Kanji mode ──
 const ALL_KANJI = "日月火水木金土山川田大中小上下左右内外白円入出立休見学先生千万永和花月空王石本正四手天羊坂戸".split("");
 let favoriteKanji = [];
 
+function toggleLightMode() {
+    const isLight = document.body.classList.toggle('light-mode');
+    const lbl = document.getElementById('theme-toggle-label');
+    const btn = document.getElementById('theme-toggle-btn');
+    if (lbl) { lbl.innerText = isLight ? 'ON' : 'OFF'; lbl.style.color = isLight ? 'var(--neon-green)' : 'var(--text-dim)'; }
+    if (btn) btn.style.borderColor = isLight ? 'var(--neon-green)' : 'var(--border)';
+    try { localStorage.setItem('mosha_light_mode', isLight ? '1' : '0'); } catch(e) {}
+}
+
+let canvasIsDark = true; // デフォルト：黒キャンバス
+
+function toggleCanvasColor() {
+    canvasIsDark = !canvasIsDark;
+    applyCanvasColor();
+    try { localStorage.setItem('mosha_canvas_dark', canvasIsDark ? '1' : '0'); } catch(e) {}
+}
+
+function applyCanvasColor() {
+    const wrap = document.getElementById('canvas-wrap');
+    const btn  = document.getElementById('canvas-toggle-btn');
+    const lbl  = document.getElementById('canvas-toggle-label');
+    if (!wrap) return;
+    wrap.classList.toggle('canvas-dark', canvasIsDark);
+    const isWhite = !canvasIsDark;
+    if (lbl) { lbl.innerText = isWhite ? 'ON' : 'OFF'; lbl.style.color = isWhite ? 'var(--neon-green)' : 'var(--text-dim)'; }
+    if (btn) btn.style.borderColor = isWhite ? 'var(--neon-green)' : 'var(--border)';
+}
+
+function loadThemeSettings() {
+    try {
+        const savedLight  = localStorage.getItem('mosha_light_mode');
+        const savedCanvas = localStorage.getItem('mosha_canvas_dark');
+        const isLight = savedLight === '1';
+        if (isLight) document.body.classList.add('light-mode');
+        const lbl = document.getElementById('theme-toggle-label');
+        const btn = document.getElementById('theme-toggle-btn');
+        if (lbl) { lbl.innerText = isLight ? 'ON' : 'OFF'; lbl.style.color = isLight ? 'var(--neon-green)' : 'var(--text-dim)'; }
+        if (btn) btn.style.borderColor = isLight ? 'var(--neon-green)' : 'var(--border)';
+        // 未保存ならデフォルト黒キャンバス
+        canvasIsDark = savedCanvas === null ? true : savedCanvas === '1';
+        applyCanvasColor();
+    } catch(e) { applyCanvasColor(); }
+}
+
 function loadKanjiSettings() {
     try {
-        const saved = localStorage.getItem('mosha_fav_kanji');
         if (saved) {
             // Filter out any kanji no longer in ALL_KANJI
             const parsed = JSON.parse(saved).filter(k => ALL_KANJI.includes(k));
@@ -1352,6 +1575,11 @@ function toggleKanji(char) {
     renderKanjiGrid();
 }
 
+function updateKanjiCount() {
+    const el = document.getElementById('kanji-select-count');
+    if (el) el.innerText = `${favoriteKanji.length} / ${ALL_KANJI.length}`;
+}
+
 function openKanjiSettings() {
     renderKanjiGrid();
     document.getElementById('kanji-settings-modal').style.display = 'flex';
@@ -1359,7 +1587,20 @@ function openKanjiSettings() {
 
 function closeKanjiSettings() {
     document.getElementById('kanji-settings-modal').style.display = 'none';
+    updateKanjiCount();
     updateReadyLabel();
+}
+
+function selectAllKanji() {
+    favoriteKanji = [...ALL_KANJI];
+    try { localStorage.setItem('mosha_fav_kanji', JSON.stringify(favoriteKanji)); } catch(e) {}
+    renderKanjiGrid();
+}
+
+function clearAllKanji() {
+    favoriteKanji = [ALL_KANJI[0]]; // 最低1つ残す
+    try { localStorage.setItem('mosha_fav_kanji', JSON.stringify(favoriteKanji)); } catch(e) {}
+    renderKanjiGrid();
 }
 
 function renderKanjiGrid() {
@@ -1667,8 +1908,52 @@ function getIdealPoints(type) {
 let lmpPlayers = [];
 let lmpCurrentIdx = 0;
 let lmpActive = false;
+let lmpQuestionSeq = []; // 全員共通の問題シーケンス
+let lmpRevealIdx = 0;    // 結果発表中のプレイヤーインデックス
+
+// 前半問題数（公開）を返す
+function lmpPublicRounds() {
+    return Math.ceil(TOTAL_ROUNDS / 2);
+}
+
+// 問題シーケンスを事前生成（全員同じ問題順）
+function lmpGenerateQuestions() {
+    lmpQuestionSeq = [];
+    const usedChars = [];
+    for (let i = 0; i < TOTAL_ROUNDS; i++) {
+        if (gameMode === 'kanji') {
+            let pool = favoriteKanji.length > 0 ? favoriteKanji : ALL_KANJI;
+            if (usedChars.length > 0 && pool.length > 1) pool = pool.filter(k => !usedChars.slice(-1).includes(k));
+            const char = pool[Math.floor(Math.random() * pool.length)];
+            usedChars.push(char);
+            lmpQuestionSeq.push({ mode: 'kanji', char, color: '#ffd84a' });
+        } else if (gameMode === 'char') {
+            const allChars = getActiveChars();
+            let pool = allChars;
+            if (usedChars.length > 0) pool = allChars.filter(c => !usedChars.slice(-1).includes(c));
+            const char = pool[Math.floor(Math.random() * pool.length)];
+            const isKana = katakana.includes(char);
+            const isAlpha = alphabet.includes(char);
+            const color = charColors[Math.floor(Math.random() * charColors.length)];
+            usedChars.push(char);
+            lmpQuestionSeq.push({ mode: 'char', char, color, isKana, isAlpha });
+        } else {
+            const available = getActiveShapes();
+            let pool = available.length > 0 ? available : shapes;
+            if (lmpQuestionSeq.length >= 2) {
+                const last2 = lmpQuestionSeq.slice(-2).map(q => q.shapeType);
+                if (pool.length > 2) pool = pool.filter(s => !last2.includes(s.type));
+            }
+            const s = pool[Math.floor(Math.random() * pool.length)];
+            lmpQuestionSeq.push({ mode: 'shape', shapeType: s.type, shapeObj: s });
+        }
+    }
+}
 
 function openLocalMP() {
+    const modeStr = gameMode==='kanji'?'漢字':gameMode==='char'?'文字':'図形';
+    const lbl = document.getElementById('lmp-settings-label');
+    if (lbl) lbl.innerText = `${modeStr}モード · ${timeModeSeconds}秒 · ${TOTAL_ROUNDS}問`;
     document.getElementById('start-btn-wrap').style.display = 'none';
     document.getElementById('lmp-setup').style.display = 'flex';
     lmpBuildInputs(2);
@@ -1687,12 +1972,12 @@ function lmpBuildInputs(count) {
 }
 function lmpAddPlayer() {
     const count = document.getElementById('lmp-player-inputs').children.length;
-    if (count >= 6) return;
+    if (count >= 4) return;
     lmpBuildInputs(count + 1);
 }
 function lmpRemovePlayer() {
     const count = document.getElementById('lmp-player-inputs').children.length;
-    if (count <= 2) return;
+    if (count <= 1) return;
     lmpBuildInputs(count - 1);
 }
 function lmpStart() {
@@ -1707,6 +1992,7 @@ function lmpStart() {
     if (!valid) { document.getElementById('lmp-setup-warn').style.display='block'; return; }
     document.getElementById('lmp-setup-warn').style.display = 'none';
     document.getElementById('lmp-setup').style.display = 'none';
+    lmpGenerateQuestions(); // 全員共通の問題を生成
     lmpActive = true; lmpCurrentIdx = 0;
     lmpShowTurn();
 }
@@ -1728,13 +2014,17 @@ function lmpStartTurn() {
     timerEl.classList.remove('danger');
     timerEl.innerText=timeModeSeconds.toFixed(1);
     progressFill.style.width='0%'; roundNumEl.innerText='1';
+    document.getElementById('total-rounds-display').innerText = TOTAL_ROUNDS;
     nextRoundBtn.style.display='inline-block'; finishBtn.style.display='none';
-    // Show player name in header
     const player = lmpPlayers[lmpCurrentIdx];
     shapeNameEl.innerText = `${player.name} のターン`;
     shapeNameEl.style.color = '#fdcb6e';
     shapeNameEl.style.textShadow = '0 0 10px rgba(253,203,110,0.5)';
-    startBGM(); nextLevel();
+    // ready-overlay を表示してスタートボタンを待つ（タイマーはまだ動かない）
+    const modeStr = gameMode==='kanji'?'漢字モード':gameMode==='char'?'文字モード':'図形モード';
+    const labelEl = document.getElementById('ready-mode-label');
+    if (labelEl) labelEl.innerText = `${modeStr} · ${timeModeSeconds}秒 · ${TOTAL_ROUNDS}問`;
+    document.getElementById('ready-overlay').style.display = 'flex';
 }
 let _lmpFinishing = false;
 function lmpFinishPlayer() {
@@ -1743,6 +2033,7 @@ function lmpFinishPlayer() {
     stopAutoCountdown();
     lmpPlayers[lmpCurrentIdx].total = totalScore;
     lmpPlayers[lmpCurrentIdx].scores = roundResults.map(r=>r.score);
+    lmpPlayers[lmpCurrentIdx].roundResults = [...roundResults];
     stopBGM();
     lmpCurrentIdx++;
     _lmpFinishing = false;
@@ -1754,10 +2045,104 @@ function lmpFinishPlayer() {
         finalScreen.style.display='none';
         lmpShowTurn();
     } else {
-        lmpShowLeaderboard();
+        lmpStartReveal(); // 全員終了 → ドラマチック発表へ
     }
 }
+
+// ── ドラマチック結果発表 ──
+let lmpRevealOrder = []; // プレイ順に発表
+
+function lmpStartReveal() {
+    progressWrap.style.display='none';
+    comboBox.style.display='none';
+    totalBox.style.display='none';
+    clearBtn.style.display='none'; menuBtn.style.display='none';
+    finalScreen.style.display='none';
+    // プレイした順番で発表
+    lmpRevealOrder = [...lmpPlayers];
+    lmpRevealIdx = 0;
+    document.getElementById('lmp-reveal').style.display = 'flex';
+    lmpShowRevealPlayer();
+}
+
+function lmpShowRevealPlayer() {
+    const maxScore = TOTAL_ROUNDS * 100;
+    const p = lmpRevealOrder[lmpRevealIdx];
+    const total = lmpRevealOrder.length;
+
+    document.getElementById('lmp-reveal-num').innerText =
+        `${lmpRevealIdx + 1} 人目 / 全 ${total} 人`;
+    document.getElementById('lmp-reveal-name').innerText = p.name;
+
+    // 発表前は順位バッジを非表示
+    const rb = document.getElementById('lmp-reveal-rank-badge');
+    rb.innerText = ''; rb.style.background = 'transparent'; rb.style.borderColor = 'transparent';
+
+    // スコアを事前セット（まだ非表示）
+    const sv = document.getElementById('lmp-reveal-score');
+    const sm = document.getElementById('lmp-reveal-max');
+    sv.style.opacity = '0'; sm.style.opacity = '0';
+    sv.innerText = p.total; sm.innerText = `/ ${maxScore}`;
+
+    // 内訳をクリア
+    document.getElementById('lmp-reveal-breakdown').innerHTML = '';
+
+    // ？？？を表示、スコアを隠す
+    document.getElementById('lmp-reveal-hidden-wrap').style.display = 'block';
+    document.getElementById('lmp-reveal-score-wrap').style.display = 'none';
+
+    // 発表ボタンだけ表示
+    document.getElementById('lmp-reveal-show-btn').style.display = 'inline-block';
+    document.getElementById('lmp-reveal-next-btn').style.display = 'none';
+    document.getElementById('lmp-reveal-finish-btn').style.display = 'none';
+}
+
+function lmpDoReveal() {
+    const p = lmpRevealOrder[lmpRevealIdx];
+    const isLast = lmpRevealIdx === lmpRevealOrder.length - 1;
+
+    // ？？？を隠し、スコアを表示
+    document.getElementById('lmp-reveal-hidden-wrap').style.display = 'none';
+    document.getElementById('lmp-reveal-score-wrap').style.display = 'flex';
+
+    const sv = document.getElementById('lmp-reveal-score');
+    const sm = document.getElementById('lmp-reveal-max');
+    setTimeout(() => {
+        sv.style.opacity = '1'; sm.style.opacity = '1';
+        spawnParticles(60);
+        playScoreSound(p.total);
+    }, 200);
+
+    // 内訳表示
+    const bd = document.getElementById('lmp-reveal-breakdown');
+    bd.innerHTML = (p.scores || []).map((s, i) => {
+        const c = s>=100?'#ffd84a':s>=90?'#4af3ff':s>=75?'#4affa0':s>=55?'#fdcb6e':s>=30?'#ff8c4a':'#ff4a4a';
+        return `<div style="font-size:10px;text-align:center;width:32px;"><div style="color:${c};font-weight:700;">${s}</div><div style="color:var(--text-dim);font-size:9px;">R${i+1}</div></div>`;
+    }).join('');
+
+    // 発表ボタンを隠し、次へ／順位発表を表示
+    document.getElementById('lmp-reveal-show-btn').style.display = 'none';
+    if (isLast) {
+        const fb = document.getElementById('lmp-reveal-finish-btn');
+        fb.innerText = '🏆 順位発表！';
+        fb.style.display = 'inline-block';
+        document.getElementById('lmp-reveal-next-btn').style.display = 'none';
+        spawnParticlesBig();
+    } else {
+        document.getElementById('lmp-reveal-next-btn').style.display = 'inline-block';
+        document.getElementById('lmp-reveal-finish-btn').style.display = 'none';
+    }
+}
+
+function lmpRevealNext() {
+    lmpRevealIdx++;
+    if (lmpRevealIdx < lmpRevealOrder.length) {
+        lmpShowRevealPlayer();
+    }
+}
+
 function lmpShowLeaderboard() {
+    document.getElementById('lmp-reveal').style.display = 'none';
     progressWrap.style.display='none';
     comboBox.style.display='none';
     totalBox.style.display='none';
@@ -1771,8 +2156,9 @@ function lmpShowLeaderboard() {
     const maxScore=TOTAL_ROUNDS*100;
 
     let html='';
+    html += `<div style="font-family:'Boogaloo',cursive;font-size:14px;letter-spacing:3px;color:#fdcb6e;text-align:center;margin-bottom:6px;">🏆 順位発表！</div>`;
     if (lmpPlayers.length>1 && sorted[0].total!==sorted[1].total)
-        html+=`<div style="font-family:'Boogaloo',cursive;font-size:20px;color:#ffd84a;text-align:center;margin-bottom:10px;text-shadow:0 0 14px rgba(255,216,74,0.4);">🏆 ${sorted[0].name} の勝ち！</div>`;
+        html+=`<div style="font-family:'Boogaloo',cursive;font-size:20px;color:#ffd84a;text-align:center;margin-bottom:10px;text-shadow:0 0 14px rgba(255,216,74,0.4);">👑 ${sorted[0].name} の勝ち！</div>`;
     else if (lmpPlayers.length>1)
         html+=`<div style="font-family:'Boogaloo',cursive;font-size:20px;color:#4af3ff;text-align:center;margin-bottom:10px;">🤝 引き分け！</div>`;
 
@@ -1790,12 +2176,15 @@ function lmpShowLeaderboard() {
     document.getElementById('lmp-leaderboard').style.display='flex';
     spawnParticlesBig();
 
-    // Ask user whether to save
-    _pendingSaveData = { sorted, maxScore };
-    setTimeout(() => {
-        document.getElementById('save-confirm-dialog').style.display = 'flex';
-    }, 800);
+    // 対戦モードは保存ダイアログをスキップ
+    if (!lmpActive) {
+        _pendingSaveData = { sorted, maxScore };
+        setTimeout(() => {
+            document.getElementById('save-confirm-dialog').style.display = 'flex';
+        }, 800);
+    }
 }
+
 let _pendingSaveData = null;
 
 function askSaveSolo() {
@@ -1854,12 +2243,15 @@ function showToast(msg) {
 
 function lmpPlayAgain() {
     document.getElementById('lmp-leaderboard').style.display='none';
+    document.getElementById('lmp-reveal').style.display='none';
     lmpCurrentIdx=0;
     lmpPlayers.forEach(p=>{ p.scores=[]; p.total=0; });
+    lmpGenerateQuestions(); // 新しい問題を生成
     lmpShowTurn();
 }
 function lmpClose() {
     document.getElementById('lmp-leaderboard').style.display='none';
+    document.getElementById('lmp-reveal').style.display='none';
     lmpActive=false; goToMenu();
 }
 
@@ -1917,10 +2309,15 @@ function openHistory(fromMenu=false) {
 
 function closeHistory() {
     document.getElementById('history-screen').style.display = 'none';
-    // Return to leaderboard if lmpActive
-    if (document.getElementById('lmp-leaderboard').style.display !== 'flex') {
-        // From menu
+    // 対戦ランキングから来た場合は戻す
+    if (lmpActive || lmpPlayers.length > 0) {
+        document.getElementById('lmp-leaderboard').style.display = 'flex';
+    } else {
+        // 通常メニューから来た場合
+        document.getElementById('start-btn-wrap').style.display = 'block';
     }
+    // 残ったままのラウンド結果オーバーレイを隠す
+    overlay.style.display = 'none';
 }
 
 function calNav(dir) {
@@ -2049,6 +2446,10 @@ function doClearHistory() {
 window.addEventListener('load', () => {
     buildShapePicker();
     loadKanjiSettings();
+    updateKanjiCount();
+    loadCharSettings();
+    updateCharCount();
+    loadThemeSettings();
     // Show current settings in ready overlay
     const modeLabel = (gameMode === 'char' ? '文字モード' : '図形モード') + ' · ' + timeModeSeconds + '秒 · ' + TOTAL_ROUNDS + '問';
     const el = document.getElementById('ready-mode-label');
@@ -2220,12 +2621,12 @@ function closeReward() {
 }
 
 function updateReadyLabel() {
-    const el = document.getElementById('ready-mode-label');
-    if (el && document.getElementById('ready-overlay').style.display === 'flex') {
-        let modeStr = gameMode === 'char' ? '文字モード' : gameMode === 'kanji' ? '漢字モード' : '図形モード';
-        let label = modeStr + ' · ' + timeModeSeconds + '秒 · ' + TOTAL_ROUNDS + '問';
-        el.innerText = label;
-    }
+    let modeStr = gameMode === 'char' ? '文字モード' : gameMode === 'kanji' ? '漢字モード' : '図形モード';
+    let label = modeStr + ' · ' + timeModeSeconds + '秒 · ' + TOTAL_ROUNDS + '問';
+    const el  = document.getElementById('ready-mode-label');
+    const el2 = document.getElementById('ready-mode-label2');
+    if (el  && document.getElementById('ready-overlay').style.display === 'flex') el.innerText  = label;
+    if (el2) el2.innerText = label;
 }
 
 function setMode(mode) {
@@ -2237,6 +2638,8 @@ function setMode(mode) {
     document.getElementById('mode-desc-char').style.display  = mode==='char'   ? 'block' : 'none';
     document.getElementById('mode-desc-kanji').style.display = mode==='kanji'  ? 'block' : 'none';
     document.getElementById('shape-picker-wrap').style.display = mode==='shape' ? 'block' : 'none';
+    document.getElementById('kanji-picker-wrap').style.display = mode==='kanji' ? 'block' : 'none';
+    document.getElementById('char-picker-wrap').style.display  = mode==='char'  ? 'block' : 'none';
     updateReadyLabel();
 }
 
@@ -2244,6 +2647,11 @@ function setTimeMode(sec) {
     timeModeSeconds = sec;
     document.getElementById('time-5').classList.toggle('active', sec===5);
     document.getElementById('time-10').classList.toggle('active', sec===10);
+    // ゲーム中でなければ右上タイマーを即座に更新
+    if (!gameActive) {
+        const timerEl = document.getElementById('timer');
+        if (timerEl) timerEl.innerText = sec.toFixed(1);
+    }
     updateReadyLabel();
 }
 
@@ -2285,8 +2693,9 @@ function getCharPoints(char) {
 
 function drawCharGuide(char, color) {
     gCtx.clearRect(0, 0, W, W);
-    gCtx.fillStyle = color;
-    gCtx.font = `bold 200px 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif`;
+    gCtx.fillStyle = canvasIsDark ? color : darkenColor(color);
+    const fontSize = canvasIsDark ? 200 : 220;
+    gCtx.font = `bold ${fontSize}px 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif`;
     gCtx.textAlign = 'center';
     gCtx.textBaseline = 'middle';
     gCtx.fillText(char, CENTER, CENTER + 10);
@@ -2300,13 +2709,14 @@ function drawCenterPoint(color='#4af3ff') {
     pCtx.stroke(); pCtx.setLineDash([]);
     pCtx.fillStyle=color;
     pCtx.beginPath(); pCtx.arc(CENTER,CENTER,5,0,Math.PI*2); pCtx.fill();
-    pCtx.strokeStyle='#0a0a14'; pCtx.lineWidth=2; pCtx.stroke();
+    pCtx.strokeStyle = canvasIsDark ? 'rgba(10,10,20,0.8)' : 'rgba(255,255,255,0.8)'; pCtx.lineWidth=2; pCtx.stroke();
 }
 
 function drawGuide(shape) {
     gCtx.clearRect(0,0,W,W);
     const p=getIdealPoints(shape.type);
-    gCtx.strokeStyle=shape.color; gCtx.lineWidth=6;
+    gCtx.strokeStyle = canvasIsDark ? shape.color : darkenColor(shape.color);
+    gCtx.lineWidth = canvasIsDark ? 6 : 9;
     gCtx.setLineDash([18,8]); gCtx.lineCap='round';
     gCtx.beginPath(); gCtx.moveTo(p[0].x,p[0].y);
     p.forEach(pt=>gCtx.lineTo(pt.x,pt.y));
@@ -2320,23 +2730,28 @@ function unlockAudioForIOS() {
     const ac = getAudioCtx();
     if (ac.state === 'suspended') ac.resume();
 
-    // BGM要素を即タップ時点でプライム（iOSは直接のユーザー操作内でないと再生を許可しない）
+    // カスタムBGMが読み込まれている場合のみプライム
     const bgmEl = document.getElementById('bgm');
-    if (bgmEl) {
+    if (bgmEl && bgmEl.src && bgmEl.readyState >= 1) {
         bgmEl.volume = 0;
-        bgmEl.play().then(() => {
-            bgmEl.pause();
-            bgmEl.currentTime = 0;
-            bgmEl.volume = 0.4;
-        }).catch(() => {});
+        const p = bgmEl.play();
+        if (p !== undefined) {
+            p.then(() => {
+                bgmEl.pause();
+                bgmEl.currentTime = 0;
+                bgmEl.volume = 0.4;
+            }).catch(() => {});
+        }
     }
 }
 
 function startGame() {
-    unlockAudioForIOS(); // ← タップと同期したタイミングでアンロック
+    unlockAudioForIOS();
 
-    document.getElementById('start-btn-wrap').style.display='none';
-    document.getElementById('ready-wrap').style.display='none';
+    if (!lmpActive) {
+        document.getElementById('start-btn-wrap').style.display='none';
+        document.getElementById('ready-wrap').style.display='none';
+    }
     document.getElementById('ready-overlay').style.display='none';
 
     // 3・2・1 カウントダウン
@@ -2382,12 +2797,14 @@ function startGame() {
 
 function _doStartGame() {
     startBGM();
-    progressWrap.style.display='block';
-    comboBox.style.display='flex';
-    totalBox.style.display='flex';
-    clearBtn.style.display='block'; menuBtn.style.display='block';
-    round=0; totalScore=0; combo=0; roundResults=[];
-    updateTotals();
+    if (!lmpActive) {
+        progressWrap.style.display='block';
+        comboBox.style.display='flex';
+        totalBox.style.display='flex';
+        clearBtn.style.display='block'; menuBtn.style.display='block';
+        round=0; totalScore=0; combo=0; roundResults=[];
+        updateTotals();
+    }
     nextLevel();
 }
 
@@ -2402,7 +2819,34 @@ function nextLevel() {
     progressFill.style.width=((round-1)/TOTAL_ROUNDS*100)+'%';
     timerEl.classList.remove('danger');
 
-    if (gameMode === 'kanji') {
+    if (lmpActive && lmpQuestionSeq.length > 0) {
+        // 全員共通の事前生成問題を使用
+        const q = lmpQuestionSeq[round - 1];
+        if (q.mode === 'kanji') {
+            currentShape = { name: `漢字: ${q.char}`, type: 'char', color: q.color, char: q.char };
+            currentIdeal = getCharPoints(q.char);
+            drawCharGuide(q.char, q.color);
+            guideCanvas.style.opacity = '0.40';
+            pCtx.clearRect(0,0,W,W);
+        } else if (q.mode === 'char') {
+            const label = q.isAlpha ? 'アルファベット' : q.isKana ? 'カタカナ' : 'ひらがな';
+            currentShape = { name: `${label}: ${q.char}`, type: 'char', color: q.color, char: q.char };
+            currentIdeal = getCharPoints(q.char);
+            drawCharGuide(q.char, q.color);
+            guideCanvas.style.opacity = '0.40';
+            pCtx.clearRect(0,0,W,W);
+        } else {
+            const s = q.shapeObj;
+            currentShape = s;
+            currentIdeal = getIdealPoints(s.type);
+            drawGuide(s);
+            guideCanvas.style.opacity = '0.45';
+            drawCenterPoint(s.color);
+        }
+        shapeNameEl.innerText = currentShape.name;
+        shapeNameEl.style.color = currentShape.color || 'var(--text)';
+        shapeNameEl.style.textShadow = '';
+    } else if (gameMode === 'kanji') {
         // Pick random kanji from favorites, avoiding the last used one
         let pool = favoriteKanji.length > 0 ? favoriteKanji : ALL_KANJI;
         if (roundResults.length >= 1) {
@@ -2416,8 +2860,7 @@ function nextLevel() {
         guideCanvas.style.opacity = '0.40';
         pCtx.clearRect(0,0,W,W);
     } else if (gameMode === 'char') {
-        const allChars = [...hiragana, ...katakana];
-        // Avoid repeats
+        const allChars = getActiveChars();
         let charPool = allChars;
         if (roundResults.length >= 1) {
             const lastChar = roundResults[roundResults.length-1].char;
@@ -2425,18 +2868,15 @@ function nextLevel() {
         }
         const char = charPool[Math.floor(Math.random() * charPool.length)];
         const isKana = katakana.includes(char);
+        const isAlpha = alphabet.includes(char);
         const color = charColors[Math.floor(Math.random() * charColors.length)];
         currentShape = {
-            name: `${isKana ? 'カタカナ' : 'ひらがな'}: ${char}`,
-            type: 'char',
-            color,
-            char
+            name: `${isAlpha ? 'アルファベット' : isKana ? 'カタカナ' : 'ひらがな'}: ${char}`,
+            type: 'char', color, char
         };
-        // Pre-compute ideal points (pixel extraction)
         currentIdeal = getCharPoints(char);
         drawCharGuide(char, color);
         guideCanvas.style.opacity = '0.40';
-        // No center point for char mode — show char label instead
         pCtx.clearRect(0,0,W,W);
     } else {
         // Avoid 3 identical shapes in a row
@@ -2503,7 +2943,12 @@ function finishRound() {
     if (score>=55) { combo++; } else { combo=0; }
     comboVal.innerText=`×${combo}`;
 
-    scoreEl.innerText=score;
+    // 対戦モード後半は点数を隠す
+    const pubRounds = lmpPublicRounds();
+    const hideScore = lmpActive && round > pubRounds;
+    scoreEl.innerText = hideScore ? '???' : score;
+    if (hideScore) scoreEl.style.color = 'var(--text-dim)';
+    else scoreEl.style.color = '';
     overlayRound.innerText=round;
 
     // Last round?
@@ -2534,8 +2979,10 @@ function finishRound() {
 }
 
 function updateTotals() {
-    totalDisplay.innerText=totalScore;
-    runningHeader.innerText=totalScore;
+    const pubRounds = lmpPublicRounds();
+    const hideTotal = lmpActive && round >= pubRounds;
+    totalDisplay.innerText = hideTotal ? '???' : totalScore;
+    runningHeader.innerText = hideTotal ? '???' : totalScore;
 }
 
 function showFinalScreen() {
@@ -3234,13 +3681,42 @@ function handleStart(e) {
     points.push(pos);
     if (e.cancelable) e.preventDefault();
 }
+// 白キャンバス用：ネオンカラーを暗く締めた色に変換
+function darkenColor(hex) {
+    const map = {
+        '#4af3ff': '#0077aa',  // シアン → 濃い青
+        '#ff4af3': '#aa0077',  // ピンク → 濃いマゼンタ
+        '#4affa0': '#007744',  // 緑     → 濃い緑
+        '#ffd84a': '#cc8800',  // 黄     → 濃いオレンジ
+        '#74b9ff': '#0044bb',  // 水色   → 濃い青
+        '#ff6b9d': '#cc0044',  // ピンク2→ 濃い赤
+        '#a29bfe': '#4422cc',  // 紫     → 濃い紫
+        '#55efc4': '#007755',  // ミント → 濃い緑
+        '#fdcb6e': '#cc7700',  // 黄橙   → 濃いオレンジ
+        '#e17055': '#aa2200',  // 橙     → 濃い赤
+        '#00cec9': '#006666',  // ティール→ 濃いティール
+        '#fd79a8': '#aa0044',  // サーモン→ 濃い赤
+    };
+    return map[hex.toLowerCase()] || '#111111';
+}
+
 function handleMove(e) {
     if (!isDrawing||!gameActive||timeLeft<=0) return;
     const pos=getPos(e);
     ctx.lineTo(pos.x,pos.y);
-    ctx.strokeStyle=currentShape.color; ctx.lineWidth=5;
+    if (canvasIsDark) {
+        ctx.strokeStyle = currentShape.color;
+        ctx.lineWidth   = 5;
+        ctx.shadowColor = currentShape.color;
+        ctx.shadowBlur  = 8;
+    } else {
+        // 白キャンバス：ネオン色そのまま＋暗いシャドウで白背景に映えさせる
+        ctx.strokeStyle = currentShape.color;
+        ctx.lineWidth   = 10;
+        ctx.shadowColor = 'rgba(0,0,0,0.45)';
+        ctx.shadowBlur  = 6;
+    }
     ctx.lineCap='round'; ctx.lineJoin='round';
-    ctx.shadowColor=currentShape.color; ctx.shadowBlur=8;
     ctx.stroke(); points.push(pos);
     if (mpMode) streamDrawPoint(pos);
     if (e.cancelable) e.preventDefault();
@@ -3266,11 +3742,14 @@ function loadCustomBGM(event) {
         bgmEl.load();
         // iOSはファイル選択のユーザー操作内でプライムしておく
         bgmEl.volume = 0;
-        bgmEl.play().then(() => {
-            bgmEl.pause();
-            bgmEl.currentTime = 0;
-            bgmEl.volume = 0.4;
-        }).catch(() => {});
+        const p = bgmEl.play();
+        if (p !== undefined) {
+            p.then(() => {
+                bgmEl.pause();
+                bgmEl.currentTime = 0;
+                bgmEl.volume = 0.4;
+            }).catch(() => {});
+        }
         const nameEl = document.getElementById('custom-bgm-name');
         if (nameEl) {
             nameEl.innerText = file.name;
@@ -3278,25 +3757,37 @@ function loadCustomBGM(event) {
         }
     }
 }
+
+let bgmPlayPromise = null;
+
 function startBGM() {
     const bgmEl = document.getElementById('bgm');
-    if (!bgmEl) return;
+    if (!bgmEl || !bgmEl.src) return;
     bgmEl.volume = 0.4;
-    bgmEl.play().catch(e => console.log('BGM Play Error:', e));
+    bgmPlayPromise = bgmEl.play().catch(e => console.log('BGM Play Error:', e));
 }
 function stopBGM() {
     const bgmEl = document.getElementById('bgm');
     if (!bgmEl) return;
     if (bgmFadeTimer) { clearInterval(bgmFadeTimer); bgmFadeTimer = null; }
-    bgmEl.pause();
-    bgmEl.currentTime = 0;
+    if (bgmPlayPromise !== null) {
+        bgmPlayPromise.then(() => {
+            bgmEl.pause();
+            bgmEl.currentTime = 0;
+        }).catch(() => {});
+        bgmPlayPromise = null;
+    } else {
+        bgmEl.pause();
+        bgmEl.currentTime = 0;
+    }
 }
 function fadeBGM(targetVol, durationMs) {
     const bgmEl = document.getElementById('bgm');
     if (!bgmEl) return;
     if (bgmFadeTimer) clearInterval(bgmFadeTimer);
     const steps = 20;
-    const volStep = (targetVol - bgmEl.volume) / steps;
+    const startVol = bgmEl.volume;
+    const volStep = (targetVol - startVol) / steps;
     let currentStep = 0;
     bgmFadeTimer = setInterval(() => {
         currentStep++;
@@ -3307,7 +3798,14 @@ function fadeBGM(targetVol, durationMs) {
         if (currentStep >= steps) {
             clearInterval(bgmFadeTimer);
             bgmFadeTimer = null;
-            if (targetVol === 0) bgmEl.pause();
+            if (targetVol === 0) {
+                if (bgmPlayPromise !== null) {
+                    bgmPlayPromise.then(() => { bgmEl.pause(); }).catch(() => {});
+                    bgmPlayPromise = null;
+                } else {
+                    bgmEl.pause();
+                }
+            }
         }
     }, durationMs / steps);
 }
