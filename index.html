@@ -1620,19 +1620,19 @@ function getIdealPoints(type) {
     const seg=(a,b,step=0.015)=>{ for(let t=0;t<=1;t+=step) p.push(lerp(a,b,t)); };
 
     if (type === 'circle') {
-        const r=92;
+        const r=97;
         for (let i=0;i<=360;i+=2) {
             const rad=i*Math.PI/180;
             p.push({x:CENTER+r*Math.cos(rad), y:CENTER+r*Math.sin(rad)});
         }
     } else if (type === 'square') {
-        const s=92;
+        const s=97;
         for (let x=-s;x<=s;x+=4) p.push({x:CENTER+x, y:CENTER-s});
         for (let y=-s;y<=s;y+=4) p.push({x:CENTER+s, y:CENTER+y});
         for (let x=s;x>=-s;x-=4) p.push({x:CENTER+x, y:CENTER+s});
         for (let y=s;y>=-s;y-=4) p.push({x:CENTER-s, y:CENTER+y});
     } else if (type === 'triangle') {
-        const r=105;
+        const r=110;
         const vt=[
             {x:CENTER, y:CENTER-r},
             {x:CENTER+r*Math.cos(Math.PI/6), y:CENTER+r*Math.sin(Math.PI/6)},
@@ -1640,19 +1640,19 @@ function getIdealPoints(type) {
         ];
         seg(vt[0],vt[1]); seg(vt[1],vt[2]); seg(vt[2],vt[0]);
     } else if (type === 'pentagon') {
-        const r=92, v=[];
+        const r=97, v=[];
         for (let i=0;i<=5;i++) {
             const a=(i*2*Math.PI/5)-Math.PI/2;
             v.push({x:CENTER+r*Math.cos(a), y:CENTER+r*Math.sin(a)});
         }
         for (let i=0;i<v.length-1;i++) seg(v[i],v[i+1],0.025);
     } else if (type === 'diamond') {
-        const w=92,h=115;
+        const w=97,h=120;
         const v=[{x:CENTER,y:CENTER-h},{x:CENTER+w,y:CENTER},{x:CENTER,y:CENTER+h},{x:CENTER-w,y:CENTER}];
         for (let i=0;i<4;i++) seg(v[i],v[(i+1)%4]);
     } else if (type === 'heart') {
         // Parametric heart, centered & scaled
-        const scale=4.8, offY=13;
+        const scale=5.1, offY=13;
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
             const hx = scale * 16*Math.pow(Math.sin(t),3);
@@ -1661,7 +1661,7 @@ function getIdealPoints(type) {
         }
     } else if (type === 'star') {
         // 5-pointed star with inner/outer radius
-        const ro=100, ri=40;
+        const ro=105, ri=45;
         const v=[];
         for (let i=0;i<10;i++) {
             const a=(i*Math.PI/5)-Math.PI/2;
@@ -1670,7 +1670,7 @@ function getIdealPoints(type) {
         }
         for (let i=0;i<10;i++) seg(v[i],v[(i+1)%10],0.02);
     } else if (type === 'hexagon') {
-        const r=96, v=[];
+        const r=101, v=[];
         for (let i=0;i<=6;i++) {
             const a=(i*Math.PI/3)-Math.PI/6;
             v.push({x:CENTER+r*Math.cos(a), y:CENTER+r*Math.sin(a)});
@@ -1678,12 +1678,12 @@ function getIdealPoints(type) {
         for (let i=0;i<v.length-1;i++) seg(v[i],v[i+1],0.02);
     } else if (type === 'arrow') {
         // Right-pointing arrow: shaft + head
-        const sx=-88, ex=70; // shaft x range
+        const sx=-93, ex=70; // shaft x range
         const shy=0;           // shaft y offset from center
-        const shh=24;          // shaft half-height
+        const shh=29;          // shaft half-height
         const hbx=35;          // arrowhead base x
-        const htip=96;        // tip x
-        const hhy=62;          // arrowhead half-height
+        const htip=101;        // tip x
+        const hhy=67;          // arrowhead half-height
         const v=[
             {x:CENTER+sx,  y:CENTER-shh},
             {x:CENTER+hbx, y:CENTER-shh},
@@ -1696,7 +1696,7 @@ function getIdealPoints(type) {
         for (let i=0;i<v.length;i++) seg(v[i],v[(i+1)%v.length],0.02);
     } else if (type === 'cross') {
         // Plus/cross shape
-        const a=35, b=100; // arm half-width, arm half-length
+        const a=40, b=105; // arm half-width, arm half-length
         const v=[
             {x:CENTER-a,y:CENTER-b},
             {x:CENTER+a,y:CENTER-b},
@@ -1713,77 +1713,77 @@ function getIdealPoints(type) {
         ];
         for (let i=0;i<v.length;i++) seg(v[i],v[(i+1)%v.length],0.02);    } else if (type === 'crescent') {
         // 三日月: 一筆書き — 外側の大きな弧 → 内側の小さな弧
-        const R=105, ri=72, ox=36;
+        const R=110, ri=77, ox=36;
         for (let i=-130;i<=130;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+R*Math.cos(a),y:CENTER+R*Math.sin(a)}); }
         for (let i=130;i>=-130;i-=2) { const a=i*Math.PI/180; p.push({x:CENTER+ox+ri*Math.cos(a),y:CENTER+ri*Math.sin(a)}); }    } else if (type === 'drop') {
         // しずく: 一筆書き — 滑らかな水滴形
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
-            const r=95*(1-0.35*Math.cos(t));
+            const r=100*(1-0.35*Math.cos(t));
             p.push({x:CENTER+r*Math.sin(t), y:CENTER-r*Math.cos(t)+22});
         }
     } else if (type === 'ellipse') {
         // 楕円
-        const rx=115, ry=75;
+        const rx=120, ry=80;
         for (let i=0;i<=360;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+rx*Math.cos(a),y:CENTER+ry*Math.sin(a)}); }
     } else if (type === 'octagon') {
         // 八角形
-        const r=105, v=[];
+        const r=110, v=[];
         for (let i=0;i<9;i++) { const a=(i*Math.PI/4)-Math.PI/8; v.push({x:CENTER+r*Math.cos(a),y:CENTER+r*Math.sin(a)}); }
         for (let i=0;i<v.length-1;i++) seg(v[i],v[i+1],0.02);    } else if (type === 'lightning') {
         // 稲妻: 一筆書き — シンプルなZ字型折れ線
         const v=[
-            {x:CENTER+128, y:CENTER-115},
-            {x:CENTER-90,  y:CENTER+5},
-            {x:CENTER+90,  y:CENTER+5},
-            {x:CENTER-128, y:CENTER+115},
+            {x:CENTER+133, y:CENTER-120},
+            {x:CENTER-95,  y:CENTER+5},
+            {x:CENTER+95,  y:CENTER+5},
+            {x:CENTER-133, y:CENTER+120},
         ];
         seg(v[0],v[1],0.01); seg(v[1],v[2],0.01); seg(v[2],v[3],0.01);
     } else if (type === 'house') {
         // 家 (roof + walls)
         const v=[
-            {x:CENTER,     y:CENTER-115},   // 屋根頂点
-            {x:CENTER+105, y:CENTER-20},     // 右ひさし
-            {x:CENTER+105, y:CENTER+110},    // 右下
-            {x:CENTER-105, y:CENTER+110},    // 左下
-            {x:CENTER-105, y:CENTER-20},     // 左ひさし
+            {x:CENTER,     y:CENTER-120},   // 屋根頂点
+            {x:CENTER+110, y:CENTER-25},     // 右ひさし
+            {x:CENTER+110, y:CENTER+115},    // 右下
+            {x:CENTER-110, y:CENTER+115},    // 左下
+            {x:CENTER-110, y:CENTER-25},     // 左ひさし
         ];
         for (let i=0;i<v.length;i++) seg(v[i],v[(i+1)%v.length],0.02);    } else if (type === 'clover') {
         // 四つ葉: 一筆書き — バラ曲線 r=|cos(2θ)| で4枚花びら
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
-            const r=Math.abs(Math.cos(2*t))*105;
+            const r=Math.abs(Math.cos(2*t))*110;
             p.push({x:CENTER+r*Math.cos(t), y:CENTER+r*Math.sin(t)});
         }
     } else if (type === 'spiral') {
         // 渦巻き (Archimedean)
         for (let i=0;i<=720;i+=3) {
             const a=i*Math.PI/180;
-            const r=(i/720)*105;
+            const r=(i/720)*110;
             p.push({x:CENTER+r*Math.cos(a),y:CENTER+r*Math.sin(a)});
         }
     } else if (type === 'righttri') {
         // 直角三角形
-        const v=[{x:CENTER-100,y:CENTER+95},{x:CENTER+105,y:CENTER+95},{x:CENTER-100,y:CENTER-100}];
+        const v=[{x:CENTER-105,y:CENTER+100},{x:CENTER+110,y:CENTER+100},{x:CENTER-105,y:CENTER-105}];
         seg(v[0],v[1]); seg(v[1],v[2]); seg(v[2],v[0]);    } else if (type === 'cloud') {
         // 雲: 一筆書き — 上部3バンプ + 底辺
         const bumps=[
-            {cx:CENTER-62,cy:CENTER+12,r:46,a1:200,a2:340},
-            {cx:CENTER-5, cy:CENTER-28,r:58,a1:195,a2:345},
-            {cx:CENTER+62,cy:CENTER+5, r:46,a1:210,a2:355},
+            {cx:CENTER-67,cy:CENTER+12,r:51,a1:200,a2:340},
+            {cx:CENTER-5, cy:CENTER-28,r:63,a1:195,a2:345},
+            {cx:CENTER+67,cy:CENTER+5, r:51,a1:210,a2:355},
         ];
         bumps.forEach(b=>{
             for (let i=b.a1;i<=b.a2;i+=3){const a=i*Math.PI/180;p.push({x:b.cx+b.r*Math.cos(a),y:b.cy+b.r*Math.sin(a)});}
         });
         const rx=CENTER+62+46*Math.cos(355*Math.PI/180);
         const lx=CENTER-62+46*Math.cos(200*Math.PI/180);
-        const by=CENTER+60;
+        const by=CENTER+65;
         seg({x:rx,y:CENTER+5+46*Math.sin(355*Math.PI/180)},{x:rx,y:by},0.01);
         seg({x:rx,y:by},{x:lx,y:by},0.01);
         seg({x:lx,y:by},{x:lx,y:CENTER+12+46*Math.sin(200*Math.PI/180)},0.01);
     } else if (type === 'note') {
         // 音符 (quarter note): 横幅を広く
-        const hx=45, hy=30;
+        const hx=50, hy=35;
         // head (tilted ellipse)
         for (let i=0;i<=360;i+=4) {
             const a=i*Math.PI/180;
@@ -1792,46 +1792,46 @@ function getIdealPoints(type) {
             p.push({x:CENTER-30+ex*cos-ey*sin, y:CENTER+75+ex*sin+ey*cos});
         }
         // stem
-        seg({x:CENTER+18,y:CENTER+58},{x:CENTER+18,y:CENTER-65},0.01);
+        seg({x:CENTER+18,y:CENTER+63},{x:CENTER+18,y:CENTER-70},0.01);
         // flag (longer reach right)
-        seg({x:CENTER+18,y:CENTER-65},{x:CENTER+95,y:CENTER-20},0.02);
-        seg({x:CENTER+95,y:CENTER-20},{x:CENTER+18,y:CENTER+5},0.02);
+        seg({x:CENTER+18,y:CENTER-70},{x:CENTER+100,y:CENTER-25},0.02);
+        seg({x:CENTER+100,y:CENTER-25},{x:CENTER+18,y:CENTER+5},0.02);
     } else if (type === 'fish') {
         // 魚
         // body (ellipse)
-        const rx=85,ry=48;
+        const rx=90,ry=53;
         for (let i=0;i<=360;i+=3) { const a=i*Math.PI/180; p.push({x:CENTER-10+rx*Math.cos(a),y:CENTER+ry*Math.sin(a)}); }
         // tail
         const tail=[
-            {x:CENTER+75,y:CENTER},
-            {x:CENTER+125,y:CENTER-65},
-            {x:CENTER+125,y:CENTER+65},
+            {x:CENTER+80,y:CENTER},
+            {x:CENTER+130,y:CENTER-70},
+            {x:CENTER+130,y:CENTER+70},
         ];
         for (let i=0;i<tail.length;i++) seg(tail[i],tail[(i+1)%tail.length],0.02);    } else if (type === 'flower') {
         // 花: 一筆書き — バラ曲線 r=|cos(3θ)| で6枚花びら
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
-            const r=Math.abs(Math.cos(3*t))*108;
+            const r=Math.abs(Math.cos(3*t))*113;
             p.push({x:CENTER+r*Math.cos(t-Math.PI/2), y:CENTER+r*Math.sin(t-Math.PI/2)});
         }    } else if (type === 'gem') {
         // 宝石: 一筆書き — シンプルなアウトラインのみ
         const v=[
-            {x:CENTER-50,y:CENTER-85},
-            {x:CENTER+50,y:CENTER-85},
-            {x:CENTER+110,y:CENTER-15},
-            {x:CENTER,   y:CENTER+110},
-            {x:CENTER-110,y:CENTER-15},
+            {x:CENTER-55,y:CENTER-90},
+            {x:CENTER+55,y:CENTER-90},
+            {x:CENTER+115,y:CENTER-20},
+            {x:CENTER,   y:CENTER+115},
+            {x:CENTER-115,y:CENTER-20},
         ];
         seg(v[4],v[0],0.02); seg(v[0],v[1],0.02); seg(v[1],v[2],0.02);
         seg(v[2],v[3],0.02); seg(v[3],v[4],0.02);
     } else if (type === 'ring') {
         // ドーナツ (2 concentric circles)
-        const R=105, r=60;
+        const R=110, r=65;
         for (let i=0;i<=360;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+R*Math.cos(a),y:CENTER+R*Math.sin(a)}); }
         for (let i=0;i<=360;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+r*Math.cos(a),y:CENTER+r*Math.sin(a)}); }
     } else if (type === 'semicircle') {
         // 半円 一筆書き: 中心点が図形の真ん中にくるよう縦位置調整
-        const r=100, cy=CENTER+r/2; // flat edge below CENTER so CENTER is vertically centered
+        const r=105, cy=CENTER+r/2; // flat edge below CENTER so CENTER is vertically centered
         for (let i=180; i<=360; i+=2) {
             const a=i*Math.PI/180;
             p.push({x:CENTER+r*Math.cos(a), y:cy+r*Math.sin(a)});
@@ -1839,7 +1839,7 @@ function getIdealPoints(type) {
         seg({x:CENTER+r,y:cy},{x:CENTER-r,y:cy},0.01);
     } else if (type === 'magnify') {
         // 虫めがね 一筆書き: 円を一周してハンドルへ続ける
-        const r=76, cx=108, cy=105, startA=45;
+        const r=81, cx=108, cy=105, startA=45;
         for (let i=startA; i<=startA+360; i+=3) {
             const a=i*Math.PI/180;
             p.push({x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)});
@@ -1849,8 +1849,8 @@ function getIdealPoints(type) {
         seg({x:hx,y:hy},{x:hx+70,y:hy+70},0.01);
     } else if (type === 'bag') {
         // カバン 一筆書き: ハンドル弧→右辺→底辺→左辺（つながった1本）
-        const l=CENTER-85, r=CENTER+85, t=CENTER-22, b=CENTER+105;
-        const hw=50, ht=52;
+        const l=CENTER-90, r=CENTER+90, t=CENTER-27, b=CENTER+110;
+        const hw=55, ht=57;
         // ハンドル弧（左付け根→頂点→右付け根）
         for (let i=180;i<=360;i+=3) {
             const a=i*Math.PI/180;
@@ -1864,7 +1864,7 @@ function getIdealPoints(type) {
         seg({x:l,y:t},{x:CENTER-hw,y:t},0.01);
     } else if (type === 'mail') {
         // メール: 封筒長方形 + Vフラップ
-        const l=CENTER-105, r=CENTER+105, t=CENTER-65, b=CENTER+80;
+        const l=CENTER-110, r=CENTER+110, t=CENTER-70, b=CENTER+85;
         seg({x:l,y:t},{x:r,y:t},0.01);
         seg({x:r,y:t},{x:r,y:b},0.01);
         seg({x:r,y:b},{x:l,y:b},0.01);
@@ -1875,7 +1875,7 @@ function getIdealPoints(type) {
         seg({x:CENTER,y:foldY},{x:r,y:t},0.01);
     } else if (type === 'bubble') {
         // 吹き出し: 角丸長方形 + しっぽ
-        const l=CENTER-100, r=CENTER+100, t=CENTER-88, b=CENTER+52, rad=28;
+        const l=CENTER-105, r=CENTER+105, t=CENTER-93, b=CENTER+57, rad=28;
         // 上辺
         seg({x:l+rad,y:t},{x:r-rad,y:t},0.01);
         // 右上角
@@ -2673,8 +2673,10 @@ function getCharPoints(char) {
     off.width = W; off.height = W;
     const oCtx = off.getContext('2d');
     // Draw character large and centered
+    const isAlphaChar = /^[A-Za-z]$/.test(char);
+    const charFontSize = isAlphaChar ? 220 : 210;
     oCtx.fillStyle = '#000';
-    oCtx.font = `bold 200px 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif`;
+    oCtx.font = `bold ${charFontSize}px 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif`;
     oCtx.textAlign = 'center';
     oCtx.textBaseline = 'middle';
     oCtx.fillText(char, CENTER, CENTER + 10);
@@ -2694,7 +2696,8 @@ function getCharPoints(char) {
 function drawCharGuide(char, color) {
     gCtx.clearRect(0, 0, W, W);
     gCtx.fillStyle = canvasIsDark ? color : darkenColor(color);
-    const fontSize = 200; // getCharPoints と同じサイズに統一（白キャンバスでもスコア基準と一致させる）
+    const isAlphaChar = /^[A-Za-z]$/.test(char);
+    const fontSize = isAlphaChar ? 220 : 210;
     gCtx.font = `bold ${fontSize}px 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif`;
     gCtx.textAlign = 'center';
     gCtx.textBaseline = 'middle';
