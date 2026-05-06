@@ -741,7 +741,7 @@
 </style>
 </head>
 <body>
-<audio id="bgm" loop preload="none"></audio>
+<audio id="bgm" loop preload="auto" src="bgm.mp3"></audio>
 <div id="game-container">
 
     <div class="header">
@@ -925,7 +925,7 @@
         <div style="margin-top:12px; display:flex; flex-direction:column; align-items:center; gap:4px;">
             <label for="custom-bgm-file" class="btn btn-clear" style="font-size:12px; padding:8px 16px; cursor:pointer; display:inline-block; text-align:center;">🎵 好きなBGMファイルを選ぶ (.mp3)</label>
             <input type="file" id="custom-bgm-file" accept="audio/*,audio/mp3,audio/mpeg" style="position:absolute; width:1px; height:1px; opacity:0; overflow:hidden;" onchange="loadCustomBGM(event)">
-            <div id="custom-bgm-name" style="font-size:11px; color:var(--neon-green); display:none;"></div>
+            <div id="custom-bgm-name" style="font-size:11px; color:var(--neon-green); display:block;">🎵 bgm.mp3（デフォルト）</div>
         </div>
         <div style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
             <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px; text-align:center;">画面テーマ</div>
@@ -3762,7 +3762,7 @@ let bgmPlayPromise = null;
 
 function startBGM() {
     const bgmEl = document.getElementById('bgm');
-    if (!bgmEl || !bgmEl.src) return;
+    if (!bgmEl) return;
     bgmEl.volume = 0.4;
     bgmPlayPromise = bgmEl.play().catch(e => console.log('BGM Play Error:', e));
 }
