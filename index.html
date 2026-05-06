@@ -3110,6 +3110,7 @@ function calculateScore() {
 
     // 1. 精度: 描いた点が理想線にどれだけ近いか
     let totalDist = 0;
+    let maxDist = 0;
     points.forEach(p => {
         let min = Infinity;
         for (let i = 0; i < ideal.length; i++) {
@@ -3117,31 +3118,45 @@ function calculateScore() {
             if (d < min) min = d;
         }
         totalDist += min;
+        if (min > maxDist) maxDist = min;
     });
     const avg = totalDist / points.length;
-    const threshold = (currentShape.type === 'char') ? 30 : 58;
+    const threshold = (currentShape.type === 'char') ? 40 : 74;
     let accuracyScore = 100 * Math.exp(-avg / threshold);
 
     // 2. カバレッジ: 理想線のどれだけの範囲を描けたか
     const coverDist = 15;
     const sampleStep = Math.max(1, Math.floor(ideal.length / 250));
     let covered = 0, total = 0;
+    let maxUncoveredRun = 0, currentRun = 0;
     for (let i = 0; i < ideal.length; i += sampleStep) {
         total++;
         const ip = ideal[i];
+        let isCovered = false;
         for (let j = 0; j < points.length; j++) {
             if (Math.hypot(points[j].x - ip.x, points[j].y - ip.y) < coverDist) {
-                covered++;
+                isCovered = true;
                 break;
             }
+        }
+        if (isCovered) {
+            covered++;
+            currentRun = 0;
+        } else {
+            currentRun++;
+            if (currentRun > maxUncoveredRun) maxUncoveredRun = currentRun;
         }
     }
     const coverage = covered / total;
     // 90%未満は減点。2.0乗で調整（元は3.0）
     const coverageMult = Math.pow(Math.min(1, coverage / 0.90), 2.0);
 
-    let score = Math.floor(accuracyScore * coverageMult);
+    let score = Math.round(accuracyScore * coverageMult);
     if (points.length < 50) score = Math.floor(score * (points.length / 50));
+
+    // 3. 逸脱ペナルティ: 見本線を連続してスキップした区間が長ければ90点以上は出ない
+    //    (角を対角線でショートカットすると skipped区間が長くなる)
+    if (maxUncoveredRun > 8 || maxDist > 35) score = Math.min(score, 89);
     return Math.max(0, Math.min(100, score));
 }
 
