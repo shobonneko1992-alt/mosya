@@ -2694,7 +2694,7 @@ function getCharPoints(char) {
 function drawCharGuide(char, color) {
     gCtx.clearRect(0, 0, W, W);
     gCtx.fillStyle = canvasIsDark ? color : darkenColor(color);
-    const fontSize = canvasIsDark ? 200 : 220;
+    const fontSize = 200; // getCharPoints と同じサイズに統一（白キャンバスでもスコア基準と一致させる）
     gCtx.font = `bold ${fontSize}px 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif`;
     gCtx.textAlign = 'center';
     gCtx.textBaseline = 'middle';
