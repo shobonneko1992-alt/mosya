@@ -3119,7 +3119,7 @@ function calculateScore() {
         totalDist += min;
     });
     const avg = totalDist / points.length;
-    const threshold = (currentShape.type === 'char') ? 25 : 48;
+    const threshold = (currentShape.type === 'char') ? 30 : 58;
     let accuracyScore = 100 * Math.exp(-avg / threshold);
 
     // 2. カバレッジ: 理想線のどれだけの範囲を描けたか
@@ -3137,8 +3137,8 @@ function calculateScore() {
         }
     }
     const coverage = covered / total;
-    // 90%未満は厳しく減点。3乗で欠けた箇所を強く罰する
-    const coverageMult = Math.pow(Math.min(1, coverage / 0.90), 3.0);
+    // 90%未満は減点。2.0乗で調整（元は3.0）
+    const coverageMult = Math.pow(Math.min(1, coverage / 0.90), 2.0);
 
     let score = Math.floor(accuracyScore * coverageMult);
     if (points.length < 50) score = Math.floor(score * (points.length / 50));
