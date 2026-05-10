@@ -1145,7 +1145,7 @@
 </div>
     <div id="history-screen" style="display:none; position:absolute; inset:0; background:var(--card); border-radius:26px; flex-direction:column; align-items:center; padding:20px 18px 16px; gap:10px; z-index:500; overflow-y:auto; animation:fadeIn 0.3s ease both;">
         <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-            <div style="font-family:'Boogaloo',cursive; font-size:14px; letter-spacing:3px; color:#fdcb6e;">📅 対戦記録</div>
+            <div style="font-family:'Boogaloo',cursive; font-size:14px; letter-spacing:3px; color:#fdcb6e;">📅 記録</div>
             <button onclick="closeHistory()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text-dim);font-size:14px;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
         </div>
 
@@ -2212,10 +2212,10 @@ function confirmSave() {
     document.getElementById('save-confirm-dialog').style.display = 'none';
     if (_pendingSaveData) {
         _pendingSaveData.sorted[0].name = name;
-        saveGameRecord(_pendingSaveData.sorted, _pendingSaveData.maxScore, _pendingSaveData.solo || false);
+        const ok = saveGameRecord(_pendingSaveData.sorted, _pendingSaveData.maxScore, _pendingSaveData.solo || false);
         _pendingSaveData = null;
         if (nameEl) nameEl.value = '';
-        showToast('💾 記録を保存しました！');
+        if (ok !== false) showToast('💾 記録を保存しました！');
     }
 }
 
@@ -2261,11 +2261,21 @@ function lmpClose() {
 const HISTORY_KEY = 'shape-master-history';
 
 function loadHistory() {
-    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
-    catch(e) { return []; }
+    try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch(e) { return []; }
 }
 function saveHistory(data) {
-    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(data)); } catch(e) {}
+    try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(data));
+        return true;
+    } catch(e) {
+        showToast('⚠️ 記録の保存に失敗しました');
+        return false;
+    }
 }
 
 function saveGameRecord(sorted, maxScore, solo=false) {
@@ -2284,9 +2294,8 @@ function saveGameRecord(sorted, maxScore, solo=false) {
     };
     const history = loadHistory();
     history.unshift(record);
-    // Keep max 200 records
     if (history.length > 200) history.splice(200);
-    saveHistory(history);
+    return saveHistory(history);
 }
 
 // Calendar state
@@ -2400,7 +2409,7 @@ function renderDayRecords(dateKey) {
         const playersHtml = rec.players.map((p,i) => {
             const displayName = p.name || '名前なし';
             return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
-                <span style="font-size:15px;">${medals[i]||`${i+1}`} <strong style="color:#ffffff;">${displayName}</strong></span>
+                <span style="font-size:15px;">${medals[i]||`${i+1}`} <strong style="color:var(--text);">${displayName}</strong></span>
                 <span style="font-family:'Boogaloo',cursive;font-size:20px;color:${colors[i]||'var(--text)'};">${p.total}<span style="font-size:11px;color:var(--text-dim);">/${rec.maxScore}</span></span>
             </div>`;
         }).join('');
