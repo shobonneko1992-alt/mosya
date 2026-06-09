@@ -65,11 +65,14 @@
             border-radius: 28px;
             padding: 20px 20px 18px;
             width: var(--container-w, 360px);
+            min-height: calc(100vh - 40px);
             box-shadow:
                 0 0 0 1px rgba(74,243,255,0.05),
                 0 24px 60px rgba(0,0,0,0.6),
                 inset 0 1px 0 rgba(255,255,255,0.05);
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
         #game-container.lmp-open {
             min-height: calc(100vh - 40px);
@@ -748,7 +751,7 @@
 <div id="game-container">
 
     <!-- ── TOP MENU SCREEN ── -->
-    <div id="top-menu" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:420px; gap:14px; padding:40px 0;">
+    <div id="top-menu" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:14px; padding:40px 0;">
         <div style="font-family:'Boogaloo',cursive; font-size:42px; color:var(--neon-blue); text-shadow:0 0 20px rgba(74,243,255,0.5); letter-spacing:3px; margin-bottom:8px;">模写マスター</div>
         <button onclick="goSolo()" style="width:100%; background:linear-gradient(135deg,rgba(74,243,255,0.15),rgba(74,255,160,0.1)); border:2px solid var(--neon-blue); border-radius:18px; padding:18px 20px; font-size:20px; font-family:'Boogaloo',cursive; color:var(--neon-blue); cursor:pointer; letter-spacing:2px; display:flex; align-items:center; justify-content:center; gap:10px; transition:all 0.2s; text-shadow:0 0 10px rgba(74,243,255,0.4);">
             🎮 1人で遊ぶ
