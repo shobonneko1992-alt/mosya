@@ -117,7 +117,32 @@
             text-shadow: 0 0 16px rgba(255,74,74,0.8);
             animation: pulse-danger 0.3s ease infinite alternate;
         }
+        /* Utility classes */
+        .ui-text-hint { text-align:center; font-size:10px; color:var(--text-dim); }
+        .ui-flex-center { display:flex; gap:10px; justify-content:center; }
+        .ui-label-sm { font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; }
+        .ui-mt8 { margin-top:8px; }
+        .ui-w100 { width:100%; }
         @keyframes pulse-danger { to { transform: scale(1.05); } }
+        @keyframes charaDance {
+            0%   { transform: rotate(-12deg) translateY(0px) scale(1.0); }
+            25%  { transform: rotate(0deg)   translateY(-8px) scale(1.05); }
+            50%  { transform: rotate(12deg)  translateY(0px) scale(1.0); }
+            75%  { transform: rotate(0deg)   translateY(-6px) scale(1.04); }
+            100% { transform: rotate(-12deg) translateY(0px) scale(1.0); }
+        }
+        @keyframes charaDanceCenter {
+            0%   { transform: translateX(-50%) translateY(0px) scale(1.0); }
+            50%  { transform: translateX(-50%) translateY(-10px) scale(1.03); }
+            100% { transform: translateX(-50%) translateY(0px) scale(1.0); }
+        }
+        @keyframes charaBounce {
+            0%   { transform: translateY(0px) scale(1.0); }
+            30%  { transform: translateY(-14px) scale(1.05); }
+            50%  { transform: translateY(0px) scale(0.97); }
+            70%  { transform: translateY(-7px) scale(1.02); }
+            100% { transform: translateY(0px) scale(1.0); }
+        }
 
         /* PROGRESS */
         .progress-wrap { margin-bottom: 10px; display: none; }
@@ -751,8 +776,11 @@
 <div id="game-container">
 
     <!-- ── TOP MENU SCREEN ── -->
-    <div id="top-menu" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:14px; padding:120px 0 40px 0;">
-        <div style="font-family:'Boogaloo',cursive; font-size:42px; color:var(--neon-blue); text-shadow:0 0 20px rgba(74,243,255,0.5); letter-spacing:3px; margin-bottom:8px;">模写マスター</div>
+    <div id="top-menu" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:14px; padding:40px 0 40px 0;">
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; margin-bottom:8px;">
+            <img src="img_0.png" id="title-chara" style="width:72px; height:72px; object-fit:contain; filter:brightness(1.05) contrast(1.05); border-radius:50%; background:var(--card); animation:charaDance 1.8s ease-in-out infinite alternate; transform-origin:bottom center;" alt="chara">
+            <div style="font-family:'Boogaloo',cursive; font-size:42px; color:var(--neon-blue); text-shadow:0 0 20px rgba(74,243,255,0.5); letter-spacing:3px;">模写マスター</div>
+        </div>
         <button onclick="goSolo()" style="width:100%; background:linear-gradient(135deg,rgba(74,243,255,0.15),rgba(74,255,160,0.1)); border:2px solid var(--neon-blue); border-radius:18px; padding:18px 20px; font-size:20px; font-family:'Boogaloo',cursive; color:var(--neon-blue); cursor:pointer; letter-spacing:2px; display:flex; align-items:center; justify-content:center; gap:10px; transition:all 0.2s; text-shadow:0 0 10px rgba(74,243,255,0.4);">
             🎮 1人で遊ぶ
         </button>
@@ -765,11 +793,14 @@
     </div>
 
     <div class="header" id="main-header" style="display:none;">
-        <div>
-            <div class="title-badge">模写マスター</div>
-            <div id="theme-label" style="display:none;"></div>
-            <div id="shape-name" style="display:none;"></div>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <div>
+                <div class="title-badge">模写マスター</div>
+                <div id="theme-label" style="display:none;"></div>
+                <div id="shape-name" style="display:none;"></div>
+            </div>
         </div>
+        <img src="img_1.png" style="width:45px; height:45px; object-fit:contain; border-radius:50%; background:var(--card); position:absolute; left:50%; animation:charaDanceCenter 0.6s ease-in-out infinite alternate; transform-origin:bottom center;" alt="chara">
         <div style="display:flex; align-items:center; gap:8px;">
             <button onclick="goToMenu()" style="background:rgba(255,255,255,0.06); border:1px solid var(--border); border-radius:10px; padding:6px 10px; color:var(--text-dim); font-size:13px; cursor:pointer; line-height:1;">🏠</button>
             <div class="timer-wrap">
@@ -833,9 +864,6 @@
             <div id="countdown-num" style="font-family:'Boogaloo',cursive; font-size:120px; line-height:1; color:var(--neon-blue); text-shadow:0 0 40px rgba(74,243,255,0.8);"></div>
         </div>
 
-
-
-
         <!-- Opponent mini canvas (multiplayer) -->
         <div id="opponent-view" style="display:none; position:absolute; bottom:8px; right:8px; width:100px; height:100px; border-radius:10px; border:2px solid var(--neon-pink); background:#08080f; box-shadow:0 0 10px rgba(255,74,243,0.3); z-index:5; overflow:hidden;">
             <canvas id="opponent-canvas" width="280" height="280" style="width:100%;height:100%;"></canvas>
@@ -873,7 +901,6 @@
             <button class="mode-btn" id="mode-kanji" onclick="setMode('kanji')">漢字</button>
         </div>
 
-
         <!-- Shape select button (shape mode only) -->
         <div id="shape-picker-wrap" style="margin-top:8px; text-align:center;">
             <button class="btn btn-clear" id="shape-select-btn" onclick="openShapeSelect()"
@@ -900,13 +927,13 @@
                 <span id="char-select-count" style="font-family:'Boogaloo',cursive; font-size:14px; color:var(--neon-blue);">-- / --</span>
             </button>
         </div>
-        <div class="mode-toggle" style="margin-top:8px;">
+        <div class="mode-toggle" class="ui-mt8">
             <button class="mode-btn" id="time-3" onclick="setTimeMode(3)">⚡ 3秒</button>
             <button class="mode-btn" id="time-5" onclick="setTimeMode(5)">⚡ 5秒</button>
             <button class="mode-btn" id="time-7" onclick="setTimeMode(7)">⏱ 7秒</button>
             <button class="mode-btn active" id="time-10" onclick="setTimeMode(10)">⏱ 10秒</button>
         </div>
-        <div style="margin-top:8px;">
+        <div class="ui-mt8">
 
             <div class="mode-toggle" style="margin-top:0;">
                 <button class="mode-btn active" id="rounds-5"  onclick="setRounds(5)">5問</button>
@@ -923,7 +950,7 @@
         </button>
         <div id="challenge-panel" style="display:none; margin-top:4px; padding:12px; border:1px solid rgba(255,216,74,0.25); border-radius:14px; background:rgba(255,216,74,0.04);">
             <div class="instruction" id="round-instruction" style="margin-bottom:8px; text-align:center;">全5問の合計点を競おう！（最大500点）</div>
-            <div style="font-size:11px; color:var(--text-dim); margin-bottom:4px;">目標得点（最大 <span id="challenge-max-hint">500</span>点）</div>
+            <div class="ui-label-sm">目標得点（最大 <span id="challenge-max-hint">500</span>点）</div>
             <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
                 <div id="challenge-slider-track" style="flex:1; height:44px; position:relative; cursor:pointer; display:flex; align-items:center;"
                     ontouchstart="sliderStart(event)"
@@ -935,10 +962,10 @@
                 </div>
                 <span id="challenge-target-display" style="font-family:'Boogaloo',cursive;font-size:22px;color:var(--neon-yellow);min-width:48px;text-align:right;">350</span>
             </div>
-            <div style="font-size:11px; color:var(--text-dim); margin-bottom:4px;">クリア時のメッセージ</div>
+            <div class="ui-label-sm">クリア時のメッセージ</div>
             <input class="lmp-input" id="challenge-reward-word" placeholder="例：アイス、やったね！" maxlength="20"
                 style="font-size:14px; padding:8px 12px; text-align:left; margin-bottom:8px; width:100%;">
-            <div style="font-size:11px; color:var(--text-dim); margin-bottom:4px;">失敗時のメッセージ</div>
+            <div class="ui-label-sm">失敗時のメッセージ</div>
             <input class="lmp-input" id="challenge-fail-word" placeholder="例：ざんねん、つぎがんばろう！" maxlength="20"
                 style="font-size:14px; padding:8px 12px; text-align:left; width:100%;">
             <div id="challenge-toggle-track" style="display:none;"></div>
@@ -984,7 +1011,6 @@
         <button class="btn btn-primary" onclick="startGame()" style="font-size:17px; padding:14px 36px;">▶ スタート！</button>
     </div>
 
-
     <!-- Shape Select Modal -->
     <div id="shape-select-modal" style="display:none; position:absolute; inset:0; background:rgba(0,0,0,0.75); z-index:400; border-radius:26px; align-items:center; justify-content:center;">
         <div style="background:var(--card); border:1px solid var(--border); border-radius:22px; padding:22px 18px; width:300px; box-shadow:0 20px 60px rgba(0,0,0,0.6);">
@@ -1027,7 +1053,7 @@
             <div style="margin-top:12px; text-align:center;">
                 <button class="btn btn-next" onclick="joinRoom()">接続する</button>
             </div>
-            <div class="lobby-status" id="join-status" style="margin-top:8px;"></div>
+            <div class="lobby-status" id="join-status" class="ui-mt8"></div>
         </div>
     </div>
 
@@ -1036,7 +1062,7 @@
         <div style="background:var(--card); border:1px solid var(--border); border-radius:20px; padding:28px 24px; text-align:center; width:260px; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
             <div style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:8px;">メニューに戻りますか？</div>
             <div style="font-size:12px; color:var(--text-dim); margin-bottom:20px;">進行中のゲームは終了します</div>
-            <div style="display:flex; gap:10px; justify-content:center;">
+            <div class="ui-flex-center">
                 <button class="btn btn-clear" style="font-size:13px; padding:9px 20px;" onclick="closeConfirm()">キャンセル</button>
                 <button class="btn btn-retry" style="font-size:13px; padding:9px 20px;" onclick="doGoToMenu()">戻る</button>
             </div>
@@ -1113,7 +1139,6 @@
         <button class="btn btn-primary" style="font-size:18px; padding:14px 44px;" onclick="lmpStartTurn()">▶ スタート！</button>
     </div>
 
-
     <!-- LMP Player Result Modal -->
     <div id="lmp-player-result" style="display:none; position:absolute; inset:0; background:rgba(10,10,20,0.97); border-radius:26px; flex-direction:column; align-items:center; padding:20px; gap:10px; z-index:500; overflow-y:auto; animation:fadeIn 0.2s ease both;">
         <div style="display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:4px;">
@@ -1127,8 +1152,8 @@
 
     <!-- Local MP: Leaderboard (shown after all players done) -->
     <div id="lmp-leaderboard" style="display:none; position:absolute; inset:0; background:var(--card); border-radius:26px; flex-direction:column; align-items:center; padding:22px 20px 18px; gap:10px; z-index:400; overflow-y:auto; animation:fadeIn 0.4s ease both;">
-        <div id="lmp-leaderboard-list" style="width:100%;"></div>
-        <div class="divider" style="width:100%;"></div>
+        <div id="lmp-leaderboard-list" class="ui-w100"></div>
+        <div class="divider" class="ui-w100"></div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
             <button class="btn" style="background:linear-gradient(135deg,#fdcb6e,#e17055);color:#0a0a14;box-shadow:0 4px 0 rgba(180,80,0,0.5);font-size:14px;" onclick="lmpPlayAgain()">🔄 もう一度</button>
             <button class="btn btn-clear" style="font-size:13px;" onclick="lmpSaveAndOpenHistory()">💾 記録を保存・見る</button>
@@ -1168,7 +1193,7 @@
             <div style="font-size:12px; color:var(--text-dim); margin-bottom:12px; line-height:1.6;">今回の結果をカレンダーに保存します</div>
             <input id="save-player-name" class="lmp-input" placeholder="プレイヤー名（例：おじいちゃん）" maxlength="16" style="margin-bottom:16px; width:100%; font-size:15px; text-align:center;">
             <div id="save-name-warn" style="font-size:11px;color:#ff4a4a;margin-top:-10px;margin-bottom:10px;display:none;">名前を入力してください</div>
-            <div style="display:flex; gap:10px; justify-content:center;">
+            <div class="ui-flex-center">
                 <button class="btn btn-clear" style="font-size:12px; padding:9px 14px; white-space:nowrap;" onclick="dismissSave()">保存しない</button>
                 <button class="btn btn-next" style="font-size:12px; padding:9px 14px; white-space:nowrap;" onclick="confirmSave()">💾 保存する</button>
             </div>
@@ -1177,7 +1202,10 @@
 
     <!-- Challenge reward overlay -->
     <div id="reward-overlay" style="display:none; position:absolute; inset:0; background:rgba(10,10,20,0.97); border-radius:26px; flex-direction:column; align-items:center; justify-content:flex-start; padding-top:80px; z-index:450; gap:14px; backdrop-filter:blur(8px);">
-        <div id="reward-title" style="font-size:18px; letter-spacing:2px;"></div>
+        <div style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:0 24px;">
+            <div id="reward-title" style="font-size:18px; letter-spacing:2px;"></div>
+            <img id="reward-chara" src="img_2.png" style="width:54px; height:54px; object-fit:contain; animation:charaBounce 0.6s ease-in-out infinite; transform-origin:bottom center; display:none;" alt="chara">
+        </div>
         <div id="reward-word-display" style="font-family:'Boogaloo',cursive; font-size:44px; line-height:1.1; background:linear-gradient(135deg,#ffd84a,#ff8c4a); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 24px rgba(255,216,74,0.6)); text-align:center; padding:0 16px;"></div>
         <div style="margin-top:40px; display:flex; flex-direction:column; align-items:center; gap:14px;">
             <div id="reward-score-display" style="font-size:15px; color:var(--text-dim); text-align:center; padding:0 16px; line-height:1.6;"></div>
@@ -1193,29 +1221,29 @@
         </div>
 
         <!-- Calendar -->
-        <div style="width:100%;">
+        <div class="ui-w100">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
                 <button onclick="calNav(-1)" style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;padding:4px 10px;">‹</button>
                 <div id="cal-month-label" style="font-family:'Boogaloo',cursive; font-size:18px; color:var(--text); letter-spacing:1px;"></div>
                 <button onclick="calNav(1)"  style="background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;padding:4px 10px;">›</button>
             </div>
             <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-bottom:4px;">
-                <div style="text-align:center;font-size:10px;color:var(--text-dim);">日</div>
-                <div style="text-align:center;font-size:10px;color:var(--text-dim);">月</div>
-                <div style="text-align:center;font-size:10px;color:var(--text-dim);">火</div>
-                <div style="text-align:center;font-size:10px;color:var(--text-dim);">水</div>
-                <div style="text-align:center;font-size:10px;color:var(--text-dim);">木</div>
-                <div style="text-align:center;font-size:10px;color:var(--text-dim);">金</div>
-                <div style="text-align:center;font-size:10px;color:var(--text-dim);">土</div>
+                <div class="ui-text-hint">日</div>
+                <div class="ui-text-hint">月</div>
+                <div class="ui-text-hint">火</div>
+                <div class="ui-text-hint">水</div>
+                <div class="ui-text-hint">木</div>
+                <div class="ui-text-hint">金</div>
+                <div class="ui-text-hint">土</div>
             </div>
             <div id="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px;"></div>
         </div>
 
-        <div class="divider" style="width:100%;"></div>
+        <div class="divider" class="ui-w100"></div>
 
         <!-- Selected day records -->
         <div id="history-day-label" style="font-size:13px; color:var(--text-dim); width:100%; text-align:center;"></div>
-        <div id="history-records" style="width:100%;"></div>
+        <div id="history-records" class="ui-w100"></div>
 
         <button onclick="clearAllHistory()" style="background:none;border:none;color:#ff4a4a;font-size:11px;cursor:pointer;text-decoration:underline;margin-top:4px;">記録をすべて削除</button>
     </div>
@@ -1256,7 +1284,7 @@
             <div style="font-size:24px; margin-bottom:8px;">🗑️</div>
             <div style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:6px;">記録をすべて削除しますか？</div>
             <div style="font-size:12px; color:var(--text-dim); margin-bottom:20px;">この操作は元に戻せません</div>
-            <div style="display:flex; gap:10px; justify-content:center;">
+            <div class="ui-flex-center">
                 <button class="btn btn-clear" style="font-size:13px; padding:10px 18px;" onclick="document.getElementById('clear-history-dialog').style.display='none'">キャンセル</button>
                 <button class="btn" style="background:linear-gradient(135deg,#ff4a4a,#cc0000);color:#fff;box-shadow:0 4px 0 rgba(150,0,0,0.5);font-size:13px;padding:10px 18px;" onclick="doClearHistory()">削除する</button>
             </div>
@@ -1294,42 +1322,33 @@ const finalScreen   = document.getElementById('final-screen');
 
 let W = 280, CENTER = 140;
 
-// ── Responsive canvas sizing ──
 (function initResponsive() {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    // Calculate optimal canvas size for the device
     let canvasSize;
     if (vw >= 900) {
-        // Large tablet / desktop
         canvasSize = Math.min(Math.floor(vw * 0.52), Math.floor(vh * 0.58), 480);
     } else if (vw >= 600) {
-        // Small / medium tablet
         canvasSize = Math.min(Math.floor(vw * 0.62), Math.floor(vh * 0.55), 400);
     } else {
-        // Phone — keep original
         canvasSize = 280;
     }
     canvasSize = Math.max(canvasSize, 280); // floor at 280
 
-    // Round to even number for pixel-perfect rendering
     if (canvasSize % 2 !== 0) canvasSize--;
 
     const containerW  = canvasSize + 80;
     const avCanvasSize = Math.round(canvasSize * 0.93);
 
-    // Apply CSS variables to root
     const root = document.documentElement;
     root.style.setProperty('--container-w',    containerW  + 'px');
     root.style.setProperty('--canvas-size',    canvasSize  + 'px');
     root.style.setProperty('--av-canvas-size', avCanvasSize + 'px');
 
-    // Update JS constants used for drawing
     W      = canvasSize;
     CENTER = canvasSize / 2;
 
-    // Set canvas element resolution
     ['guide-canvas', 'draw-canvas', 'point-canvas'].forEach(id => {
         const c = document.getElementById(id);
         if (c) { c.width = canvasSize; c.height = canvasSize; }
@@ -1371,7 +1390,6 @@ const shapes = [
     { name:"吹き出し 💬", type:"bubble",    color:"#74b9ff", icon:"💬" },
 ];
 
-// All shapes enabled by default
 let enabledShapes = new Set(shapes.map(s => s.type));
 
 function getActiveShapes() {
@@ -1440,7 +1458,6 @@ function clearAllShapes() {
     updateShapeCountBadge();
 }
 
-// Build picker after DOM ready
 window.addEventListener('load', buildShapePicker);
 
 const hiragana = [
@@ -1471,9 +1488,7 @@ const katakana = [
 
 const charColors = ['#ff6b9d','#a29bfe','#55efc4','#fdcb6e','#74b9ff','#fd79a8','#00cec9','#e17055'];
 
-// ── 文字セレクト ──
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-// 各グループのON/OFF管理
 let charGroupEnabled = { hiragana: true, katakana: true, alphabet: true };
 
 function getActiveChars() {
@@ -1488,7 +1503,6 @@ function loadCharSettings() {
     try {
         const saved = localStorage.getItem('mosha_char_groups');
         if (saved) charGroupEnabled = { ...charGroupEnabled, ...JSON.parse(saved) };
-        // 最低1つONを保証
         if (!Object.values(charGroupEnabled).some(Boolean)) charGroupEnabled.hiragana = true;
     } catch(e) {}
 }
@@ -1548,7 +1562,6 @@ function updateCharCount() {
     el.innerText = `${count} / ${total}`;
 }
 
-// ── Kanji mode ──
 const ALL_KANJI = "日月火水木金土山川田大中小上下左右内外白円入出立休見学先生千万永和花月空王石本正四手天羊坂戸".split("");
 let favoriteKanji = [];
 
@@ -1600,7 +1613,6 @@ function loadThemeSettings() {
 function loadKanjiSettings() {
     try {
         if (saved) {
-            // Filter out any kanji no longer in ALL_KANJI
             const parsed = JSON.parse(saved).filter(k => ALL_KANJI.includes(k));
             favoriteKanji = parsed.length > 0 ? parsed : [...ALL_KANJI];
         } else {
@@ -1695,7 +1707,6 @@ function getIdealPoints(type) {
         const v=[{x:CENTER,y:CENTER-h},{x:CENTER+w,y:CENTER},{x:CENTER,y:CENTER+h},{x:CENTER-w,y:CENTER}];
         for (let i=0;i<4;i++) seg(v[i],v[(i+1)%4]);
     } else if (type === 'heart') {
-        // Parametric heart, centered & scaled
         const scale=5.1, offY=13;
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
@@ -1704,7 +1715,6 @@ function getIdealPoints(type) {
             p.push({x:CENTER+hx, y:CENTER+hy+offY});
         }
     } else if (type === 'star') {
-        // 5-pointed star with inner/outer radius
         const ro=105, ri=45;
         const v=[];
         for (let i=0;i<10;i++) {
@@ -1721,7 +1731,6 @@ function getIdealPoints(type) {
         }
         for (let i=0;i<v.length-1;i++) seg(v[i],v[i+1],0.02);
     } else if (type === 'arrow') {
-        // Right-pointing arrow: shaft + head
         const sx=-93, ex=70; // shaft x range
         const shy=0;           // shaft y offset from center
         const shh=29;          // shaft half-height
@@ -1739,7 +1748,6 @@ function getIdealPoints(type) {
         ];
         for (let i=0;i<v.length;i++) seg(v[i],v[(i+1)%v.length],0.02);
     } else if (type === 'cross') {
-        // Plus/cross shape
         const a=40, b=105; // arm half-width, arm half-length
         const v=[
             {x:CENTER-a,y:CENTER-b},
@@ -1756,26 +1764,21 @@ function getIdealPoints(type) {
             {x:CENTER-a,y:CENTER-a},
         ];
         for (let i=0;i<v.length;i++) seg(v[i],v[(i+1)%v.length],0.02);    } else if (type === 'crescent') {
-        // 三日月: 一筆書き — 外側の大きな弧 → 内側の小さな弧
         const R=110, ri=77, ox=36;
         for (let i=-130;i<=130;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+R*Math.cos(a),y:CENTER+R*Math.sin(a)}); }
         for (let i=130;i>=-130;i-=2) { const a=i*Math.PI/180; p.push({x:CENTER+ox+ri*Math.cos(a),y:CENTER+ri*Math.sin(a)}); }    } else if (type === 'drop') {
-        // しずく: 一筆書き — 滑らかな水滴形
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
             const r=100*(1-0.35*Math.cos(t));
             p.push({x:CENTER+r*Math.sin(t), y:CENTER-r*Math.cos(t)+22});
         }
     } else if (type === 'ellipse') {
-        // 楕円
         const rx=120, ry=80;
         for (let i=0;i<=360;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+rx*Math.cos(a),y:CENTER+ry*Math.sin(a)}); }
     } else if (type === 'octagon') {
-        // 八角形
         const r=110, v=[];
         for (let i=0;i<9;i++) { const a=(i*Math.PI/4)-Math.PI/8; v.push({x:CENTER+r*Math.cos(a),y:CENTER+r*Math.sin(a)}); }
         for (let i=0;i<v.length-1;i++) seg(v[i],v[i+1],0.02);    } else if (type === 'lightning') {
-        // 稲妻: 一筆書き — シンプルなZ字型折れ線
         const v=[
             {x:CENTER+133, y:CENTER-120},
             {x:CENTER-95,  y:CENTER+5},
@@ -1784,7 +1787,6 @@ function getIdealPoints(type) {
         ];
         seg(v[0],v[1],0.01); seg(v[1],v[2],0.01); seg(v[2],v[3],0.01);
     } else if (type === 'house') {
-        // 家 (roof + walls)
         const v=[
             {x:CENTER,     y:CENTER-120},   // 屋根頂点
             {x:CENTER+110, y:CENTER-25},     // 右ひさし
@@ -1793,24 +1795,20 @@ function getIdealPoints(type) {
             {x:CENTER-110, y:CENTER-25},     // 左ひさし
         ];
         for (let i=0;i<v.length;i++) seg(v[i],v[(i+1)%v.length],0.02);    } else if (type === 'clover') {
-        // 四つ葉: 一筆書き — バラ曲線 r=|cos(2θ)| で4枚花びら
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
             const r=Math.abs(Math.cos(2*t))*110;
             p.push({x:CENTER+r*Math.cos(t), y:CENTER+r*Math.sin(t)});
         }
     } else if (type === 'spiral') {
-        // 渦巻き (Archimedean)
         for (let i=0;i<=720;i+=3) {
             const a=i*Math.PI/180;
             const r=(i/720)*110;
             p.push({x:CENTER+r*Math.cos(a),y:CENTER+r*Math.sin(a)});
         }
     } else if (type === 'righttri') {
-        // 直角三角形
         const v=[{x:CENTER-105,y:CENTER+100},{x:CENTER+110,y:CENTER+100},{x:CENTER-105,y:CENTER-105}];
         seg(v[0],v[1]); seg(v[1],v[2]); seg(v[2],v[0]);    } else if (type === 'cloud') {
-        // 雲: 一筆書き — 上部3バンプ + 底辺
         const bumps=[
             {cx:CENTER-67,cy:CENTER+12,r:51,a1:200,a2:340},
             {cx:CENTER-5, cy:CENTER-28,r:63,a1:195,a2:345},
@@ -1826,39 +1824,30 @@ function getIdealPoints(type) {
         seg({x:rx,y:by},{x:lx,y:by},0.01);
         seg({x:lx,y:by},{x:lx,y:CENTER+12+46*Math.sin(200*Math.PI/180)},0.01);
     } else if (type === 'note') {
-        // 音符 (quarter note): 横幅を広く
         const hx=50, hy=35;
-        // head (tilted ellipse)
         for (let i=0;i<=360;i+=4) {
             const a=i*Math.PI/180;
             const cos=Math.cos(-0.5), sin=Math.sin(-0.5);
             const ex=hx*Math.cos(a), ey=hy*Math.sin(a);
             p.push({x:CENTER-30+ex*cos-ey*sin, y:CENTER+75+ex*sin+ey*cos});
         }
-        // stem
         seg({x:CENTER+18,y:CENTER+63},{x:CENTER+18,y:CENTER-70},0.01);
-        // flag (longer reach right)
         seg({x:CENTER+18,y:CENTER-70},{x:CENTER+100,y:CENTER-25},0.02);
         seg({x:CENTER+100,y:CENTER-25},{x:CENTER+18,y:CENTER+5},0.02);
     } else if (type === 'fish') {
-        // 魚
-        // body (ellipse)
         const rx=90,ry=53;
         for (let i=0;i<=360;i+=3) { const a=i*Math.PI/180; p.push({x:CENTER-10+rx*Math.cos(a),y:CENTER+ry*Math.sin(a)}); }
-        // tail
         const tail=[
             {x:CENTER+80,y:CENTER},
             {x:CENTER+130,y:CENTER-70},
             {x:CENTER+130,y:CENTER+70},
         ];
         for (let i=0;i<tail.length;i++) seg(tail[i],tail[(i+1)%tail.length],0.02);    } else if (type === 'flower') {
-        // 花: 一筆書き — バラ曲線 r=|cos(3θ)| で6枚花びら
         for (let i=0;i<=360;i+=2) {
             const t=i*Math.PI/180;
             const r=Math.abs(Math.cos(3*t))*113;
             p.push({x:CENTER+r*Math.cos(t-Math.PI/2), y:CENTER+r*Math.sin(t-Math.PI/2)});
         }    } else if (type === 'gem') {
-        // 宝石: 一筆書き — シンプルなアウトラインのみ
         const v=[
             {x:CENTER-55,y:CENTER-90},
             {x:CENTER+55,y:CENTER-90},
@@ -1869,12 +1858,10 @@ function getIdealPoints(type) {
         seg(v[4],v[0],0.02); seg(v[0],v[1],0.02); seg(v[1],v[2],0.02);
         seg(v[2],v[3],0.02); seg(v[3],v[4],0.02);
     } else if (type === 'ring') {
-        // ドーナツ (2 concentric circles)
         const R=110, r=65;
         for (let i=0;i<=360;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+R*Math.cos(a),y:CENTER+R*Math.sin(a)}); }
         for (let i=0;i<=360;i+=2) { const a=i*Math.PI/180; p.push({x:CENTER+r*Math.cos(a),y:CENTER+r*Math.sin(a)}); }
     } else if (type === 'semicircle') {
-        // 半円 一筆書き: 中心点が図形の真ん中にくるよう縦位置調整
         const r=105, cy=CENTER+r/2; // flat edge below CENTER so CENTER is vertically centered
         for (let i=180; i<=360; i+=2) {
             const a=i*Math.PI/180;
@@ -1882,7 +1869,6 @@ function getIdealPoints(type) {
         }
         seg({x:CENTER+r,y:cy},{x:CENTER-r,y:cy},0.01);
     } else if (type === 'magnify') {
-        // 虫めがね 一筆書き: 円を一周してハンドルへ続ける
         const r=81, cx=108, cy=105, startA=45;
         for (let i=startA; i<=startA+360; i+=3) {
             const a=i*Math.PI/180;
@@ -1892,75 +1878,54 @@ function getIdealPoints(type) {
         const hy=cy+r*Math.sin(startA*Math.PI/180);
         seg({x:hx,y:hy},{x:hx+70,y:hy+70},0.01);
     } else if (type === 'bag') {
-        // カバン 一筆書き: ハンドル弧→右辺→底辺→左辺（つながった1本）
         const l=CENTER-90, r=CENTER+90, t=CENTER-27, b=CENTER+110;
         const hw=55, ht=57;
-        // ハンドル弧（左付け根→頂点→右付け根）
         for (let i=180;i<=360;i+=3) {
             const a=i*Math.PI/180;
             p.push({x:CENTER+hw*Math.cos(a), y:t+ht*Math.sin(a)});
         }
-        // 本体（右付け根→右辺→底辺→左辺→左付け根）
         seg({x:CENTER+hw,y:t},{x:r,y:t},0.01);
         seg({x:r,y:t},{x:r,y:b},0.01);
         seg({x:r,y:b},{x:l,y:b},0.01);
         seg({x:l,y:b},{x:l,y:t},0.01);
         seg({x:l,y:t},{x:CENTER-hw,y:t},0.01);
     } else if (type === 'mail') {
-        // メール: 封筒長方形 + Vフラップ
         const l=CENTER-110, r=CENTER+110, t=CENTER-70, b=CENTER+85;
         seg({x:l,y:t},{x:r,y:t},0.01);
         seg({x:r,y:t},{x:r,y:b},0.01);
         seg({x:r,y:b},{x:l,y:b},0.01);
         seg({x:l,y:b},{x:l,y:t},0.01);
-        // Vフラップ（上辺の角から中央へ）
         const foldY = t + (b-t)*0.40;
         seg({x:l,y:t},{x:CENTER,y:foldY},0.01);
         seg({x:CENTER,y:foldY},{x:r,y:t},0.01);
     } else if (type === 'bubble') {
-        // 吹き出し: 角丸長方形 + しっぽ
         const l=CENTER-105, r=CENTER+105, t=CENTER-93, b=CENTER+57, rad=28;
-        // 上辺
         seg({x:l+rad,y:t},{x:r-rad,y:t},0.01);
-        // 右上角
         for(let i=270;i<=360;i+=3){const a=i*Math.PI/180;p.push({x:r-rad+rad*Math.cos(a),y:t+rad+rad*Math.sin(a)});}
-        // 右辺
         seg({x:r,y:t+rad},{x:r,y:b-rad},0.01);
-        // 右下角
         for(let i=0;i<=90;i+=3){const a=i*Math.PI/180;p.push({x:r-rad+rad*Math.cos(a),y:b-rad+rad*Math.sin(a)});}
-        // 下辺（しっぽの隙間あり）
         const tx=CENTER-45;
         seg({x:r-rad,y:b},{x:tx+28,y:b},0.01);
-        // しっぽ
         seg({x:tx+28,y:b},{x:tx-18,y:b+62},0.01);
         seg({x:tx-18,y:b+62},{x:tx-8,y:b},0.01);
-        // 下辺続き
         seg({x:tx-8,y:b},{x:l+rad,y:b},0.01);
-        // 左下角
         for(let i=90;i<=180;i+=3){const a=i*Math.PI/180;p.push({x:l+rad+rad*Math.cos(a),y:b-rad+rad*Math.sin(a)});}
-        // 左辺
         seg({x:l,y:b-rad},{x:l,y:t+rad},0.01);
-        // 左上角
         for(let i=180;i<=270;i+=3){const a=i*Math.PI/180;p.push({x:l+rad+rad*Math.cos(a),y:t+rad+rad*Math.sin(a)});}
     }
     return p;
 }
 
-// ═══════════════════════════════════════════
-// ── LOCAL MULTIPLAYER ──
-// ═══════════════════════════════════════════
 let lmpPlayers = [];
 let lmpCurrentIdx = 0;
 let lmpActive = false;
 let lmpQuestionSeq = []; // 全員共通の問題シーケンス
 let lmpRevealIdx = 0;    // 結果発表中のプレイヤーインデックス
 
-// 前半問題数（公開）を返す
 function lmpPublicRounds() {
     return Math.ceil(TOTAL_ROUNDS / 2);
 }
 
-// 問題シーケンスを事前生成（全員同じ問題順）
 function lmpGenerateQuestions() {
     lmpQuestionSeq = [];
     const usedChars = [];
@@ -2153,7 +2118,6 @@ function lmpFinishPlayer() {
     }
 }
 
-// ── ドラマチック結果発表 ──
 let lmpRevealOrder = []; // プレイ順に発表
 
 function lmpStartReveal() {
@@ -2162,7 +2126,6 @@ function lmpStartReveal() {
     totalBox.style.display='none';
     clearBtn.style.display='none'; menuBtn.style.display='none';
     finalScreen.style.display='none';
-    // プレイした順番で発表
     lmpRevealOrder = [...lmpPlayers];
     lmpRevealIdx = 0;
     document.getElementById('lmp-reveal').style.display = 'flex';
@@ -2178,24 +2141,19 @@ function lmpShowRevealPlayer() {
         `${lmpRevealIdx + 1} 人目 / 全 ${total} 人`;
     document.getElementById('lmp-reveal-name').innerText = p.name;
 
-    // 発表前は順位バッジを非表示
     const rb = document.getElementById('lmp-reveal-rank-badge');
     rb.innerText = ''; rb.style.background = 'transparent'; rb.style.borderColor = 'transparent';
 
-    // スコアを事前セット（まだ非表示）
     const sv = document.getElementById('lmp-reveal-score');
     const sm = document.getElementById('lmp-reveal-max');
     sv.style.opacity = '0'; sm.style.opacity = '0';
     sv.innerText = p.total; sm.innerText = `/ ${maxScore}`;
 
-    // 内訳をクリア
     document.getElementById('lmp-reveal-breakdown').innerHTML = '';
 
-    // ？？？を表示、スコアを隠す
     document.getElementById('lmp-reveal-hidden-wrap').style.display = 'block';
     document.getElementById('lmp-reveal-score-wrap').style.display = 'none';
 
-    // 発表ボタンだけ表示
     document.getElementById('lmp-reveal-show-btn').style.display = 'inline-block';
     document.getElementById('lmp-reveal-next-btn').style.display = 'none';
     document.getElementById('lmp-reveal-finish-btn').style.display = 'none';
@@ -2205,7 +2163,6 @@ function lmpDoReveal() {
     const p = lmpRevealOrder[lmpRevealIdx];
     const isLast = lmpRevealIdx === lmpRevealOrder.length - 1;
 
-    // ？？？を隠し、スコアを表示
     document.getElementById('lmp-reveal-hidden-wrap').style.display = 'none';
     document.getElementById('lmp-reveal-score-wrap').style.display = 'flex';
 
@@ -2217,14 +2174,12 @@ function lmpDoReveal() {
         playScoreSound(p.total);
     }, 200);
 
-    // 内訳表示
     const bd = document.getElementById('lmp-reveal-breakdown');
     bd.innerHTML = (p.scores || []).map((s, i) => {
         const c = s>=100?'#ffd84a':s>=90?'#4af3ff':s>=75?'#4affa0':s>=55?'#fdcb6e':s>=30?'#ff8c4a':'#ff4a4a';
         return `<div style="font-size:10px;text-align:center;width:32px;"><div style="color:${c};font-weight:700;">${s}</div><div style="color:var(--text-dim);font-size:9px;">R${i+1}</div></div>`;
     }).join('');
 
-    // 発表ボタンを隠し、次へ／順位発表を表示
     document.getElementById('lmp-reveal-show-btn').style.display = 'none';
     if (isLast) {
         const fb = document.getElementById('lmp-reveal-finish-btn');
@@ -2245,27 +2200,10 @@ function lmpRevealNext() {
     }
 }
 
-function lmpOpenViewer(playerIdx, roundIdx) {
-    const p = lmpPlayers[playerIdx];
-    if (!p || !p.roundResults) return;
-    // 一時的にroundResultsを差し替えてopenViewer
-    const original = roundResults;
-    roundResults = p.roundResults;
-    openViewer(roundIdx);
-    // viewerが閉じたら元に戻す
-    const origClose = closeViewer;
-    window._lmpViewerClose = function() {
-        artViewer.style.display = 'none';
-        roundResults = original;
-        window.closeViewer = origClose;
-    };
-    artViewer.querySelector('.av-close').onclick = window._lmpViewerClose;
-}
 function toggleResultImg(id) {
     const el = document.getElementById(id);
     if (!el) return;
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
-    // ▼▲切り替え
     const row = el.previousElementSibling;
     if (row) {
         const span = row.querySelector('span:last-child');
@@ -2371,7 +2309,6 @@ function lmpShowLeaderboard() {
     document.getElementById('lmp-leaderboard').style.display='flex';
     spawnParticlesBig();
 
-    // 対戦モードは保存ダイアログをスキップ
     if (!lmpActive) {
         _pendingSaveData = { sorted, maxScore };
         setTimeout(() => {
@@ -2450,9 +2387,6 @@ function lmpClose() {
     lmpActive=false; goToMenu();
 }
 
-// ═══════════════════════════════════════════
-// ── HISTORY & CALENDAR ──
-// ═══════════════════════════════════════════
 const HISTORY_KEY = 'shape-master-history';
 
 function loadHistory() {
@@ -2493,7 +2427,6 @@ function saveGameRecord(sorted, maxScore, solo=false) {
     return saveHistory(history);
 }
 
-// Calendar state
 let calYear, calMonth, calSelectedDate, historyData;
 
 let _historyFrom = 'top';
@@ -2542,7 +2475,6 @@ function renderCalendar() {
     const label = `${calYear}年 ${calMonth+1}月`;
     document.getElementById('cal-month-label').innerText = label;
 
-    // Get dates that have records
     const datesWithData = new Set(historyData.map(r => r.date));
 
     const grid = document.getElementById('cal-grid');
@@ -2553,7 +2485,6 @@ function renderCalendar() {
     const today = new Date();
     const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
-    // Empty cells before first day
     for (let i = 0; i < firstDay; i++) {
         grid.innerHTML += `<div></div>`;
     }
@@ -2605,7 +2536,6 @@ function renderDayRecords(dateKey) {
     const medals = ['🥇','🥈','🥉'];
     const colors = ['#ffd84a','#b2bec3','#e17055'];
 
-    // Find global indices in historyData for deletion
     el.innerHTML = records.map((rec) => {
         const globalIdx = historyData.indexOf(rec);
         const playersHtml = rec.players.map((p,i) => {
@@ -2653,7 +2583,6 @@ function doClearHistory() {
     showToast('🗑️ 記録を削除しました');
 }
 
-// Also add history button to the start menu
 window.addEventListener('load', () => {
     buildShapePicker();
     loadKanjiSettings();
@@ -2661,13 +2590,11 @@ window.addEventListener('load', () => {
     loadCharSettings();
     updateCharCount();
     loadThemeSettings();
-    // Show current settings in ready overlay
     const modeLabel = (gameMode === 'char' ? '文字モード' : '図形モード') + ' · ' + timeModeSeconds + '秒 · ' + TOTAL_ROUNDS + '問';
     const el = document.getElementById('ready-mode-label');
     if (el) el.innerText = modeLabel;
 });
 
-// ── Auto-advance countdown ──
 let autoTimer = null;
 const autoCountdownEl = document.getElementById('auto-countdown');
 
@@ -2700,7 +2627,6 @@ function onNextBtn() {
             sendToOpp({ type: 'next_round' });
             mpNextRound();
         }
-        // Guest waits for host's next_round signal (button disabled for guest)
     } else {
         nextLevel();
     }
@@ -2711,8 +2637,6 @@ function onFinishBtn() {
     if (mpMode) mpShowFinalScreen(); else showFinalScreen();
 }
 
-
-// ── Custom Slider ──
 let _sliderDragging = false;
 const _sliderTrackId = 'challenge-slider-track';
 
@@ -2776,11 +2700,10 @@ function toggleChallengePanel() {
 function updateChallengeTarget(val) {
     challengeTarget = parseInt(val);
     document.getElementById('challenge-target-display').innerText = val;
-    // Clamp to max possible score
     const max = TOTAL_ROUNDS * 100;
     if (challengeTarget > max) {
         challengeTarget = max;
-        document.getElementById('challenge-target-slider').value = max;
+        const sliderEl = document.getElementById('challenge-target-slider'); if (sliderEl) sliderEl.value = max;
         document.getElementById('challenge-target-display').innerText = max;
     }
 }
@@ -2791,7 +2714,6 @@ function updateChallengeSliderMax() {
     const el = document.getElementById('challenge-max-hint');
     if (el) el.innerText = max;
     if (challengeTarget > max) challengeTarget = max;
-    // スライダー位置と表示値を再計算
     const pct = Math.round((challengeTarget - min) / (max - min) * 100);
     document.getElementById('challenge-target-display').innerText = challengeTarget;
     document.getElementById('challenge-slider-fill').style.width = pct + '%';
@@ -2817,6 +2739,7 @@ function showReward(word, score, achieved) {
     if (achieved) {
         titleEl.innerText = '🎉 おめでとう！';
         titleEl.style.color = 'var(--neon-green)';
+        document.getElementById('reward-chara').style.display = 'block';
         wordEl.innerText = `${word}`;
         wordEl.style.fontSize = '44px';
         scoreEl.innerText = `${score}点 ／ 目標 ${challengeTarget}点`;
@@ -2824,6 +2747,7 @@ function showReward(word, score, achieved) {
     } else {
         const diff = challengeTarget - score;
         titleEl.innerText = '';
+        document.getElementById('reward-chara').style.display = 'none';
         wordEl.innerHTML = `目標達成まで<br>あと ${diff} 点でした！`;
         wordEl.style.fontSize = '36px';
         const failMsg = word ? `<span style='font-size:24px;'>${word}</span><br>` : '';
@@ -2867,7 +2791,6 @@ function setTimeMode(sec) {
         const el2 = document.getElementById('lmp-time-'+v);
         if (el2) el2.classList.toggle('active', v===sec);
     });
-    // ゲーム中でなければ右上タイマーを即座に更新
     if (!gameActive) {
         const timerEl = document.getElementById('timer');
         if (timerEl) timerEl.innerText = sec.toFixed(1);
@@ -2889,12 +2812,10 @@ function setRounds(n) {
     updateChallengeSliderMax();
 }
 
-// ── Character ideal points via pixel extraction ──
 function getCharPoints(char) {
     const off = document.createElement('canvas');
     off.width = W; off.height = W;
     const oCtx = off.getContext('2d');
-    // Draw character large and centered
     const isAlphaChar = /^[A-Za-z]$/.test(char);
     const charFontSize = isAlphaChar ? 220 : 210;
     oCtx.fillStyle = '#000';
@@ -2949,13 +2870,10 @@ function drawGuide(shape) {
     gCtx.stroke(); gCtx.setLineDash([]);
 }
 
-// ── Game flow ──
 function unlockAudioForIOS() {
-    // AudioContext のアンロック（iOS Safari 対策）
     const ac = getAudioCtx();
     if (ac.state === 'suspended') ac.resume();
 
-    // BGMをプライム（デフォルト・カスタム両方）
     const bgmEl = document.getElementById('bgm');
     if (bgmEl) {
         bgmEl.volume = 0;
@@ -2983,7 +2901,6 @@ function startGame() {
     }
     document.getElementById('ready-overlay').style.display='none';
 
-    // 3・2・1 カウントダウン
     const cdOverlay = document.getElementById('countdown-overlay');
     const cdNum = document.getElementById('countdown-num');
     cdOverlay.style.display = 'flex';
@@ -2994,11 +2911,9 @@ function startGame() {
         cdNum.style.transform = 'scale(1.3)';
         cdNum.style.opacity = '1';
         cdNum.innerText = count;
-        // 色を変える
         const colors = ['#ff4af3','#ffd84a','#4af3ff'];
         cdNum.style.color = colors[count-1] || '#4af3ff';
         cdNum.style.textShadow = `0 0 40px ${colors[count-1] || '#4af3ff'}80`;
-        // アニメ
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 cdNum.style.transition = 'transform 0.7s ease, opacity 0.7s ease';
@@ -3006,7 +2921,6 @@ function startGame() {
                 cdNum.style.opacity = '0.2';
             });
         });
-        // サウンド
         const ac = getAudioCtx();
         if (ac.state === 'suspended') ac.resume();
         playTone(ac, count === 1 ? 880 : 660, 0.12, 'sine', 0.25);
@@ -3049,7 +2963,6 @@ function nextLevel() {
     timerEl.classList.remove('danger');
 
     if (lmpActive && lmpQuestionSeq.length > 0) {
-        // 全員共通の事前生成問題を使用
         const q = lmpQuestionSeq[round - 1];
         if (q.mode === 'kanji') {
             currentShape = { name: `漢字: ${q.char}`, type: 'char', color: q.color, char: q.char };
@@ -3076,7 +2989,6 @@ function nextLevel() {
         shapeNameEl.style.color = currentShape.color || 'var(--text)';
         shapeNameEl.style.textShadow = '';
     } else if (gameMode === 'kanji') {
-        // Pick random kanji from favorites, avoiding the last used one
         let pool = favoriteKanji.length > 0 ? favoriteKanji : ALL_KANJI;
         if (roundResults.length >= 1) {
             const lastChar = roundResults[roundResults.length-1].char;
@@ -3108,7 +3020,6 @@ function nextLevel() {
         guideCanvas.style.opacity = '0.40';
         pCtx.clearRect(0,0,W,W);
     } else {
-        // Avoid 3 identical shapes in a row
         let pool = getActiveShapes();
         if (roundResults.length >= 2) {
             const last2 = roundResults.slice(-2).map(r => r.shape);
@@ -3152,14 +3063,12 @@ function finishRound() {
     updateTotals();
     progressFill.style.width=(round/TOTAL_ROUNDS*100)+'%';
 
-    // MP: send my score to opponent
     if (mpMode) {
         myRoundScore = score;
         sendToOpp({ type: 'round_score', score });
         checkBothScores();
     }
 
-    // Grade
     let grade, gColor;
     if      (score>=100){ grade='★ PERFECT';   gColor='#ffd84a'; }
     else if (score>=90) { grade='✦ EXCELLENT'; gColor='#4af3ff'; }
@@ -3171,11 +3080,9 @@ function finishRound() {
     gradeBadge.innerText=grade;
     gradeBadge.style.cssText+=`;color:${gColor};background:${gColor}20;border:1px solid ${gColor}50;`;
 
-    // Combo
     if (score>=55) { combo++; } else { combo=0; }
     comboVal.innerText=`×${combo}`;
 
-    // 対戦モード後半は点数を隠す
     const pubRounds = lmpPublicRounds();
     const hideScore = lmpActive && round > pubRounds;
     scoreEl.innerText = hideScore ? '???' : score;
@@ -3183,7 +3090,6 @@ function finishRound() {
     else scoreEl.style.color = '';
     overlayRound.innerText=round;
 
-    // Last round?
     if (round>=TOTAL_ROUNDS) {
         nextRoundBtn.style.display='none';
         if (lmpActive) {
@@ -3205,7 +3111,6 @@ function finishRound() {
     sv.classList.remove('score-pop'); void sv.offsetWidth; sv.classList.add('score-pop');
     overlay.style.display='flex';
 
-    // Auto-advance after 3 seconds
     if (round >= TOTAL_ROUNDS) {
         startAutoCountdown(mpMode ? mpShowFinalScreen : showFinalScreen);
     } else {
@@ -3245,9 +3150,7 @@ function showFinalScreen() {
 
     document.getElementById('final-total-display').innerText=totalScore;
 
-    // Breakdown grid
     const bd=document.getElementById('breakdown');
-    // Adapt breakdown grid columns (5 per row, max 5 cols)
     const cols = Math.min(5, TOTAL_ROUNDS);
     bd.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
     bd.innerHTML=roundResults.map((r,i)=>{
@@ -3268,10 +3171,8 @@ function showFinalScreen() {
 }
 
 function cleanupAfterGame() {
-    // Reset MP state
     mpMode = false; isHost = false;
     oppTotalScore = 0; oppScore = null; myRoundScore = null;
-    // Reset local MP state
     lmpActive = false;
     oppView.style.display = 'none';
     vsWrap.style.display = 'none';
@@ -3343,7 +3244,6 @@ function goToMenu() {
     goTopMenu();
 }
 
-// ── トップメニュー画面切り替え ──
 function goTopMenu() {
     document.getElementById('top-menu').style.display = 'flex';
     document.getElementById('start-btn-wrap').style.display = 'none';
@@ -3386,7 +3286,6 @@ function calculateScore() {
     const ideal = currentIdeal;
     if (!ideal || ideal.length === 0) return 0;
 
-    // 1. 精度: 描いた点が理想線にどれだけ近いか
     let totalDist = 0;
     let maxDist = 0;
     points.forEach(p => {
@@ -3402,7 +3301,6 @@ function calculateScore() {
     const threshold = (currentShape.type === 'char') ? 40 : 74;
     let accuracyScore = 100 * Math.exp(-avg / threshold);
 
-    // 2. カバレッジ: 理想線のどれだけの範囲を描けたか
     const coverDist = 15;
     const sampleStep = Math.max(1, Math.floor(ideal.length / 250));
     let covered = 0, total = 0;
@@ -3426,14 +3324,11 @@ function calculateScore() {
         }
     }
     const coverage = covered / total;
-    // 90%未満は減点。2.0乗で調整（元は3.0）
     const coverageMult = Math.pow(Math.min(1, coverage / 0.90), 2.0);
 
     let score = Math.round(accuracyScore * coverageMult);
     if (points.length < 50) score = Math.floor(score * (points.length / 50));
 
-    // 3. 逸脱ペナルティ: 見本線を連続してスキップした区間が長ければ90点以上は出ない
-    //    (角を対角線でショートカットすると skipped区間が長くなる)
     if (maxUncoveredRun > 8 || maxDist > 35) score = Math.min(score, 89);
     return Math.max(0, Math.min(100, score));
 }
@@ -3456,7 +3351,6 @@ function spawnParticles(score) {
 
 function spawnParticlesBig() {}
 
-// ── Artwork Viewer ──
 let viewerIndex = 0;
 const artViewer    = document.getElementById('artwork-viewer');
 const avGuideImg   = document.getElementById('av-guide-img');
@@ -3514,12 +3408,6 @@ function renderViewer() {
     ).join('');
 }
 
-
-// ── BGM ──
-
-// ═══════════════════════════════════════════
-// ── MULTIPLAYER (PeerJS) ──
-// ═══════════════════════════════════════════
 let mpMode = false;        // are we in multiplayer?
 let isHost = false;        // am I the host?
 let myPeer = null;         // PeerJS peer
@@ -3528,7 +3416,6 @@ let mpRoomCode = '';       // 6-char room code
 let oppScore = null;       // opponent's score for this round
 let myRoundScore = null;   // my score for this round
 
-// Throttle for streaming drawing points
 let lastSendTime = 0;
 const SEND_INTERVAL = 60; // ms
 
@@ -3597,7 +3484,6 @@ function initHostPeer() {
         }, 800);
     });
     myPeer.on('error', e => {
-        // Code conflict - regenerate
         if (e.type === 'unavailable-id') {
             mpRoomCode = generateCode();
             myPeer.destroy();
@@ -3640,7 +3526,6 @@ function setupConn() {
 function handleMpData(data) {
     switch (data.type) {
         case 'start_game':
-            // Guest receives game settings and starts
             gameMode = data.gameMode;
             timeModeSeconds = data.timeModeSeconds;
             isHost = false;
@@ -3651,23 +3536,19 @@ function handleMpData(data) {
             break;
 
         case 'start_round':
-            // Guest receives the shape/char for this round
             mpGuestStartRound(data);
             break;
 
         case 'draw_points':
-            // Live drawing from opponent - render on opponent canvas
             renderOppPoints(data.points, data.color, data.reset);
             break;
 
         case 'round_score':
-            // Opponent's score arrived
             oppScore = data.score;
             checkBothScores();
             break;
 
         case 'next_round':
-            // Host triggers next round
             if (!isHost) onNextBtn();
             break;
     }
@@ -3677,9 +3558,7 @@ function sendToOpp(data) {
     if (conn && conn.open) conn.send(data);
 }
 
-// ── MP Game Start ──
 function startMpGame() {
-    // Host starts game and tells guest
     sendToOpp({ type: 'start_game', gameMode, timeModeSeconds });
     document.getElementById('start-btn-wrap').style.display = 'none';
     setupMpUI();
@@ -3696,7 +3575,6 @@ function mpStartGameAsGuest() {
     round = 0; totalScore = 0; combo = 0; roundResults = [];
     oppTotalScore = 0;
     updateTotals();
-    // Guest waits for start_round from host
 }
 
 function setupMpUI() {
@@ -3713,7 +3591,6 @@ function mpNextRound() {
     oppScore = null;
     myRoundScore = null;
 
-    // Pick shape same as normal nextLevel
     let candidates = gameMode === 'char'
         ? [...hiragana, ...katakana]
         : shapes.map(s => s.type);
@@ -3807,7 +3684,6 @@ function renderOppPoints(pts, color, reset) {
 
 function checkBothScores() {
     if (myRoundScore === null || oppScore === null) return;
-    // Both scores in - show VS result
     vsMyScore.innerText = myRoundScore;
     vsOppScore.innerText = oppScore;
     if (myRoundScore > oppScore)       { vsMyScore.className='vs-num vs-win'; vsOppScore.className='vs-num vs-lose'; }
@@ -3818,7 +3694,6 @@ function checkBothScores() {
     oppTotalScore += oppScore;
 }
 
-// Override handleMove to stream points in MP
 function streamDrawPoint(pos) {
     if (!mpMode || !conn || !conn.open) return;
     const now = Date.now();
@@ -3827,14 +3702,10 @@ function streamDrawPoint(pos) {
     sendToOpp({ type: 'draw_points', points: [pos], color: currentShape.color, reset: false });
 }
 
-// Override clearDraw to sync
 const _origClearDraw = clearDraw;
-// (clearDraw is redefined below)
 
-// ── MP Final Screen ──
 function mpShowFinalScreen() {
     showFinalScreen();
-    // Add opponent total to final screen
     const el = document.getElementById('final-total-display');
     const wrap = el.parentElement;
     const existing = document.getElementById('mp-final-vs');
@@ -3855,11 +3726,9 @@ function mpShowFinalScreen() {
                 <div style="font-family:'Boogaloo',cursive;font-size:36px;color:${!myWin&&!draw?'var(--neon-green)':'#ff4a4a'}">${oppTotalScore}</div>
             </div>
         `;
-        // Insert after rank badge
         const rankBadge = document.getElementById('final-rank-badge');
         rankBadge.after(div);
     }
-    // Winner banner
     const winBanner = document.getElementById('win-banner') || document.createElement('div');
     winBanner.id = 'win-banner';
     winBanner.style.cssText = 'font-family:"Boogaloo",cursive;font-size:22px;letter-spacing:3px;padding:8px 24px;border-radius:50px;';
@@ -3869,43 +3738,33 @@ function mpShowFinalScreen() {
     document.getElementById('final-screen').insertBefore(winBanner, document.getElementById('final-screen').children[1]);
 }
 
-
 let audioCtx = null;
 function getAudioCtx() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     return audioCtx;
 }
 
-// ── Sound ──
-
-
 function playScoreSound(score) {
     const ac = getAudioCtx();
     if (ac.state === 'suspended') ac.resume();
 
     if (score >= 90) {
-        // PERFECT: 明るい上昇アルペジオ
         const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5 E5 G5 C6 E6
         notes.forEach((freq, i) => {
             setTimeout(() => playTone(ac, freq, 0.18, 'sine', 0.32), i * 70);
         });
-        // キラキラ高音
         setTimeout(() => playTone(ac, 2093, 0.25, 'sine', 0.15), 380);
     } else if (score >= 75) {
-        // GREAT: 元気な3音
         const notes = [523.25, 783.99, 1046.50];
         notes.forEach((freq, i) => {
             setTimeout(() => playTone(ac, freq, 0.18, 'sine', 0.28), i * 80);
         });
     } else if (score >= 55) {
-        // GOOD: 2音
         setTimeout(() => playTone(ac, 440, 0.15, 'sine', 0.22), 0);
         setTimeout(() => playTone(ac, 659.25, 0.18, 'sine', 0.22), 90);
     } else if (score >= 30) {
-        // OK: 1音（少し低め）
         playTone(ac, 392, 0.2, 'sine', 0.18);
     } else {
-        // MISS: 下降2音
         playTone(ac, 300, 0.12, 'sawtooth', 0.10);
         setTimeout(() => playTone(ac, 220, 0.18, 'sawtooth', 0.10), 100);
     }
@@ -3915,7 +3774,6 @@ function playFinalSound(totalScore) {
     const ac = getAudioCtx();
     if (ac.state === 'suspended') ac.resume();
     if (totalScore >= 800) {
-        // ファンファーレ風
         const fanfare = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1568, 2093];
         fanfare.forEach((freq, i) => {
             setTimeout(() => playTone(ac, freq, 0.22, 'sine', 0.28), i * 55);
@@ -3941,7 +3799,6 @@ function playTone(ac, freq, duration, type, gain) {
     osc.stop(ac.currentTime + duration);
 }
 
-// Swipe support for artwork viewer
 let swipeStartX = 0;
 artViewer.addEventListener('touchstart', e => { swipeStartX = e.touches[0].clientX; }, {passive:true});
 artViewer.addEventListener('touchend', e => {
@@ -3949,7 +3806,6 @@ artViewer.addEventListener('touchend', e => {
     if (Math.abs(dx) > 40) viewerNav(dx < 0 ? 1 : -1);
 }, {passive:true});
 
-// ── Drawing input ──
 function getPos(e) {
     const rect=drawCanvas.getBoundingClientRect();
     const sx=drawCanvas.width/rect.width, sy=drawCanvas.height/rect.height;
@@ -3964,7 +3820,6 @@ function handleStart(e) {
     points.push(pos);
     if (e.cancelable) e.preventDefault();
 }
-// 白キャンバス用：ネオンカラーを暗く締めた色に変換
 function darkenColor(hex) {
     const map = {
         '#4af3ff': '#0077aa',  // シアン → 濃い青
@@ -3993,7 +3848,6 @@ function handleMove(e) {
         ctx.shadowColor = currentShape.color;
         ctx.shadowBlur  = 8;
     } else {
-        // 白キャンバス：ネオン色そのまま＋暗いシャドウで白背景に映えさせる
         ctx.strokeStyle = currentShape.color;
         ctx.lineWidth   = 10;
         ctx.shadowColor = 'rgba(0,0,0,0.45)';
@@ -4013,7 +3867,6 @@ drawCanvas.addEventListener('touchstart', handleStart, {passive:false});
 window.addEventListener('touchmove', handleMove, {passive:false});
 window.addEventListener('touchend', handleEnd);
 
-// ── BGM Control (MP3) ──
 let bgmFadeTimer = null;
 
 function loadCustomBGM(event) {
@@ -4023,7 +3876,6 @@ function loadCustomBGM(event) {
     if (bgmEl) {
         bgmEl.src = URL.createObjectURL(file);
         bgmEl.load();
-        // iOSはファイル選択のユーザー操作内でプライムしておく
         bgmEl.volume = 0;
         const p = bgmEl.play();
         if (p !== undefined) {
@@ -4093,7 +3945,6 @@ function fadeBGM(targetVol, durationMs) {
     }, durationMs / steps);
 }
 
-// (handled in local MP history load block above)
 </script>
 
   <script>
