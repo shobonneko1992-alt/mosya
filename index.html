@@ -770,8 +770,69 @@
         .vs-draw { color: var(--neon-yellow); }
 
 </style>
+<style id="theme-neon">
+/* ===== 共通デザイン（光る背景＋ガラス風カード＋丸ボタン＋タイトル演出） ===== */
+.app-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,rgba(30,50,110,.55) 0%,transparent 60%)}
+body.light-mode .app-bg{background:radial-gradient(120% 80% at 50% 0%,rgba(74,243,255,.18) 0%,transparent 60%)}
+.ts-blob{position:absolute;border-radius:50%;pointer-events:none;will-change:transform}
+.ts-blob.b1{width:260px;height:260px;left:-80px;top:-50px;animation:tsFloat 9s ease-in-out infinite}
+.ts-blob.b2{width:200px;height:200px;right:-60px;top:40%;animation:tsFloat 11s ease-in-out -3s infinite}
+.ts-blob.b3{width:280px;height:280px;left:15%;bottom:-130px;animation:tsFloat 13s ease-in-out -6s infinite}
+.app-bg .ts-blob,.title-screen .ts-blob{filter:blur(38px)}
+.ts-blob.b1{background:rgba(74,243,255,.34)}.ts-blob.b2{background:rgba(255,74,243,.26)}.ts-blob.b3{background:rgba(74,255,160,.2)}
+.app-bg .ts-blob.b1{opacity:.7}.app-bg .ts-blob.b2{opacity:.6}.app-bg .ts-blob.b3{opacity:.55}
+@keyframes tsFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18px,-26px) scale(1.1)}}
+#game-container{z-index:1;background:rgba(22,22,40,.9)!important;backdrop-filter:blur(10px);border-color:rgba(74,243,255,.35)!important;box-shadow:0 0 34px rgba(74,243,255,.14),0 24px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.07)!important}
+body.light-mode #game-container{background:rgba(255,255,255,.92)!important;box-shadow:0 0 30px rgba(74,243,255,.2),0 18px 50px rgba(40,40,90,.18)!important}
+#top-menu>button{border-radius:999px!important;box-shadow:0 4px 18px rgba(0,0,0,.35);animation:tsUp .55s ease-out both;transition:transform .12s,box-shadow .12s}
+#top-menu>button:nth-of-type(1){animation-delay:.05s;box-shadow:0 4px 22px rgba(74,243,255,.28)}
+#top-menu>button:nth-of-type(2){animation-delay:.15s;box-shadow:0 4px 22px rgba(253,203,110,.25)}
+#top-menu>button:nth-of-type(3){animation-delay:.25s}
+#top-menu>button:active{transform:scale(.96)}
+#top-menu>div:first-child{animation:tsUp .55s ease-out both}
+.progress-track{background:rgba(255,255,255,.08)!important;border:1px solid rgba(74,243,255,.2)}
+body.light-mode .progress-track{background:rgba(0,0,0,.06)!important}
+.canvas-wrap{border-color:rgba(74,243,255,.4)!important;border-radius:20px!important;box-shadow:0 0 22px rgba(74,243,255,.18),inset 0 0 30px rgba(0,0,0,.25)!important}
+.btn{box-shadow:0 4px 14px rgba(0,0,0,.28)}
+
+/* ===== タイトル画面 ===== */
+.title-screen{position:fixed;inset:0;z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:radial-gradient(120% 80% at 50% 0%,#17265a 0%,#0e0e1a 62%),#0e0e1a;color:#fff;transition:opacity .45s,transform .45s;cursor:pointer;padding:20px;box-sizing:border-box;overflow:hidden;font-family:'Noto Sans JP',sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.title-screen.out{opacity:0;transform:scale(1.06);pointer-events:none}
+.title-screen.hidden{display:none}
+.ts-logo{width:128px;height:128px;overflow:visible;animation:tsPop .7s cubic-bezier(.2,1.4,.4,1) both;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5))}
+.ts-frame{fill:rgba(255,255,255,.06);stroke:rgba(74,243,255,.5);stroke-width:1.6}
+.ts-guide{fill:none;stroke:rgba(255,255,255,.35);stroke-width:2;stroke-dasharray:2.2 2.2;stroke-linejoin:round}
+.ts-draw{fill:none;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100;animation:tsStroke 1.7s .5s ease-in-out forwards,tsGlow 2.6s 2.4s ease-in-out infinite}
+@keyframes tsStroke{to{stroke-dashoffset:0}}
+@keyframes tsGlow{0%,100%{filter:drop-shadow(0 0 2px #4af3ff)}50%{filter:drop-shadow(0 0 8px #ff4af3)}}
+@keyframes tsPop{from{transform:scale(.5) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+.title-main{display:flex;font-size:42px;font-weight:900;letter-spacing:.04em;color:#4af3ff;text-shadow:0 0 20px rgba(74,243,255,.55);position:relative;overflow:hidden;padding:2px 8px}
+.title-main span{display:inline-block;opacity:0;animation:tsRise .6s cubic-bezier(.2,1.2,.4,1) forwards;animation-delay:calc(1s + var(--i)*.08s)}
+.title-main::after{content:"";position:absolute;top:0;bottom:0;width:30%;left:-50%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-18deg);animation:tsShine 3.8s 2.4s ease-in-out infinite;pointer-events:none}
+@keyframes tsRise{from{opacity:0;transform:translateY(24px) scale(.8)}to{opacity:1;transform:none}}
+@keyframes tsShine{0%{left:-50%}45%,100%{left:130%}}
+.title-sub{font-family:'Boogaloo',cursive;font-size:15px;letter-spacing:.42em;padding-left:.42em;color:#ff4af3;text-shadow:0 0 12px rgba(255,74,243,.5);opacity:0;animation:tsFade .8s 1.7s ease-out forwards}
+@keyframes tsFade{to{opacity:.95}}
+.title-start{margin-top:12px;background:linear-gradient(135deg,#4af3ff,#0a84ff);color:#06122a;border:0;font-family:inherit;font-size:17px;font-weight:900;letter-spacing:.2em;padding:14px 48px;border-radius:999px;box-shadow:0 4px 20px rgba(74,243,255,.45);opacity:0;animation:tsUp .6s 1.9s ease-out forwards,tsPulse 2.2s 2.6s ease-in-out infinite;cursor:pointer}
+.title-start:active{transform:scale(.95)}
+@keyframes tsUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes tsPulse{0%,100%{box-shadow:0 4px 20px rgba(74,243,255,.45),0 0 0 0 rgba(74,243,255,.55)}50%{box-shadow:0 4px 20px rgba(74,243,255,.45),0 0 0 12px rgba(74,243,255,0)}}
+@media (prefers-reduced-motion:reduce){.app-bg .ts-blob,.title-screen,.title-screen *,.title-screen *::after,#top-menu>*{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}}
+</style>
 </head>
 <body>
+<div class="app-bg" aria-hidden="true"><div class="ts-blob b1"></div><div class="ts-blob b2"></div><div class="ts-blob b3"></div></div>
+<div id="titleScreen" class="title-screen" onclick="closeTitle()">
+<div class="ts-blob b1"></div><div class="ts-blob b2"></div><div class="ts-blob b3"></div>
+<svg class="ts-logo" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="tsg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4af3ff"/><stop offset="1" stop-color="#ff4af3"/></linearGradient></defs>
+<rect x="3" y="3" width="94" height="94" rx="24" class="ts-frame"/>
+<path d="M50.0 18.0 L71.2 83.1 L15.8 42.9 L84.2 42.9 L28.8 83.1 L50.0 18.0" class="ts-guide" pathLength="100"/>
+<path d="M50.0 18.0 L71.2 83.1 L15.8 42.9 L84.2 42.9 L28.8 83.1 L50.0 18.0" class="ts-draw" pathLength="100" stroke="url(#tsg)"/></svg>
+<div class="title-main"><span style="--i:0">模</span><span style="--i:1">写</span><span style="--i:2">マ</span><span style="--i:3">ス</span><span style="--i:4">タ</span><span style="--i:5">ー</span></div>
+<div class="title-sub">COPY MASTER</div>
+<button class="title-start" onclick="event.stopPropagation();closeTitle()">はじめる</button>
+</div>
+<script>function closeTitle(){var el=document.getElementById("titleScreen");if(!el||el.classList.contains("out"))return;el.classList.add("out");setTimeout(function(){el.classList.add("hidden");},400);}</script>
 <audio id="bgm" loop preload="auto" src="bgm.mp3"></audio>
 <div id="game-container">
 
@@ -3949,8 +4010,12 @@ function fadeBGM(targetVol, durationMs) {
 
   <script>
     if ('serviceWorker' in navigator) {
+      var hadCtl = !!navigator.serviceWorker.controller, reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (hadCtl && !reloaded) { reloaded = true; location.reload(); }
+      });
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js');
+        navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => {});
       });
     }
   </script>
